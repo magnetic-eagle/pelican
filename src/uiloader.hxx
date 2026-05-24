@@ -1,9 +1,6 @@
 #ifndef PELICAN_UILOADER_HXX
 #define PELICAn_UILOADER_HXX
 
-#include <iostream>
-
-#include <QUiLoader>
 #include <QFile>
 
 #include <easyqt/uiloader.hxx>

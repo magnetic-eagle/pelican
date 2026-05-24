@@ -5,17 +5,19 @@
 #include <QLabel>
 #include <QWidget>
 
-#include "singleton.hxx"
+#include <easyqt/singleton.hxx>
 
 #include "media.hxx"
 
 namespace pelican {
-	class MediaInfoPane: public Singleton<MediaInfoPane, QWidget> {
+	class MediaInfoPane: public QWidget, public easyqt::NamedSingleton<MediaInfoPane> {
 		Q_OBJECT
 		public:
-			MediaInfoPane();
 			void setMedia(MediaPtr media);
 			void showMediaInfo();
+		
+		protected:
+			virtual void initImpl() override;
 		
 		private:
 			QGridLayout _layout;

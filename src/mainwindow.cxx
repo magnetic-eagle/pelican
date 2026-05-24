@@ -4,12 +4,7 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 
-#include <iostream>
-
-#include "application.hxx"
-#include "mediainfopane.hxx"
-#include "mediaview.hxx"
-#include "menubar.hxx"
+#include "mainwindow.hxx"
 #include "uiloader.hxx"
 
 namespace pelican {
@@ -17,7 +12,6 @@ namespace pelican {
 	}
 	
 	MainWindow::~MainWindow() {
-		delete MenuBar::instance("pelican::GlobalMenuBar");
 		delete mainWidget;
 	}
 	
@@ -25,10 +19,14 @@ namespace pelican {
 		setWindowTitle("Pelican");
 		loadWidgetFromFile<MainWindow>("res:ui/mainwindow.ui");
 		QSplitter* mainSplitter = findChild<QSplitter*>("MainSplitter");
-		mainSplitter->setCollapsible(0, false);
-		mainSplitter->setCollapsible(2, false);
+		if (!mainSplitter) {
+			LOG(ERROR, "Could not find widget 'mainSplitter'");
+		} else {
+			mainSplitter->setCollapsible(0, false);
+			mainSplitter->setCollapsible(2, false);
 		
-		mainSplitter->setStretchFactor(1, 1);
+			mainSplitter->setStretchFactor(1, 1);
+		}
 		//mainWidget = new QWidget();
 		//QVBoxLayout mainLayout;
 		//mainWidget->setLayout(&mainLayout);

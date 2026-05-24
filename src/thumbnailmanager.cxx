@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cstdint>
 #include <sstream>
 
 #include <QStandardPaths>

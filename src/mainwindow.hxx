@@ -3,10 +3,10 @@
 
 #include <QMainWindow>
 
-#include "singleton.hxx"
+#include <easyqt/singleton.hxx>
 
 namespace pelican {
-	class MainWindow: public Singleton<MainWindow, QMainWindow> {
+	class MainWindow: public QMainWindow, public easyqt::NamedSingleton<MainWindow> {
 		Q_OBJECT
 		public:
 			MainWindow();

@@ -2,16 +2,15 @@
 #define PELICAN_THUMBNAILMANAGER_HXX
 
 #include <filesystem>
-#include <string>
 
 #include <QPixmap>
 
-#include "singleton.hxx"
+#include <easyqt/singleton.hxx>
 
 #include "media.hxx"
 
 namespace pelican {
-	class ThumbnailManager: public Singleton<ThumbnailManager> {
+	class ThumbnailManager: public easyqt::NamedSingleton<ThumbnailManager> {
 		public:
 			ThumbnailManager();
 		

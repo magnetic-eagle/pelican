@@ -23,6 +23,7 @@ target_link_libraries(
 	Qt::Concurrent
 	Qt::Core
 	Qt::Gui
+	Qt::UiTools
 	Qt::Widgets
 	argparse
 	easyqt

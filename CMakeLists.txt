@@ -14,13 +14,15 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(PkgConfig)
 find_package(FreeImagePlus REQUIRED)
 find_package(exiv2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(pystring REQUIRED)
 
-find_package(Qt5 COMPONENTS Concurrent Core Gui Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Concurrent Core Gui UiTools Widgets REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(3rdparty)

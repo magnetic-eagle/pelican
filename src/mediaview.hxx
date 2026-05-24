@@ -9,13 +9,9 @@
 #include <QRubberBand>
 #include <QScrollArea>
 
-#include <filesystem>
-#include <set>
-
 #include <easyqt/flowlayout.hxx>
 #include <easyqt/scrollarea.hxx>
-
-#include "singleton.hxx"
+#include <easyqt/singleton.hxx>
 
 #include "media.hxx"
 
@@ -53,7 +49,7 @@ namespace pelican {
 			bool _selected = {false};
 	};
 	
-	class MediaView: public Singleton<MediaView, easyqt::ScrollArea> {
+	class MediaView: public easyqt::ScrollArea, public easyqt::Singleton<MediaView> {
 		Q_OBJECT
 		
 		public:

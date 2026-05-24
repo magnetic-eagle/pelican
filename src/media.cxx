@@ -2,6 +2,7 @@
 #include <easyqt/utils.hxx>
 
 #include <exiv2/exiv2.hpp>
+#include <memory>
 
 #include "media.hxx"
 #include "thumbnailmanager.hxx"
@@ -53,7 +54,7 @@ namespace pelican {
 	}
 	
 	QSize Media::size(std::string suffix) {
-		Exiv2::Image::AutoPtr image;
+		std::unique_ptr<Exiv2::Image> image;
 		try {
 			image = Exiv2::ImageFactory::open(path().concat(suffix));
 		} catch (Exiv2::BasicError<char>& e) {

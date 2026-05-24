@@ -3,6 +3,11 @@
 	<menu>
 		<label>File</label>
 		<menuitem>
+			<label>Settings</label>
+			<icon>preferences-system</icon>
+			<command>show-settings-dialog</command>
+		</menuitem>
+		<menuitem>
 			<label>Quit</label>
 			<icon>application-exit</icon>
 			<command>quit</command>
@@ -19,7 +24,7 @@
 		<menuitem>
 			<label>Invert selection</label>
 			<command>mediaview-invert-selection</command>
-			<shortcut>Crl+i</shortcut>
+			<shortcut>Ctrl+i</shortcut>
 		</menuitem>
 	</menu>
 	<menu>
@@ -49,4 +54,3 @@
 		</menu>
 	</menu> 
 </menubar>
-

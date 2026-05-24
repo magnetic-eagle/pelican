@@ -2,7 +2,6 @@
 #define PELICAN_APPLICATION_HXX
 
 #include <map>
-#include <memory>
 #include <filesystem>
 
 #include <QFileSystemWatcher>
@@ -12,7 +11,6 @@
 
 #include <argparse/argparse.hpp>
 
-#include "mainwindow.hxx"
 #include "media.hxx"
 
 namespace pelican {
@@ -35,7 +33,7 @@ namespace pelican {
 		
 		private:
 			QFileSystemWatcher _mediaDirectoryWatcher;
-			std::filesystem::path _mediaDirectoryPath = {"/media/mama/WD-5TB/Kamera/LumixG85/Fotos"};
+			std::filesystem::path _mediaDirectoryPath = {"/mnt/Toshiba-1TB/Photos/la-photo-au-coeur-du-sauvage/"};
 			std::map<std::string, MediaPtr> _medias;
 	};
 }

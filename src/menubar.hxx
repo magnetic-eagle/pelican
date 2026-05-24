@@ -3,16 +3,14 @@
 
 #include <easyqt/logging.hxx>
 #include <easyqt/menubar.hxx>
+#include <easyqt/singleton.hxx>
 
 namespace pelican {
-	class MenuBar: public Singleton<MenuBar, easyqt::MenuBar> {
+	class MenuBar: public easyqt::MenuBar, public easyqt::NamedSingleton<MenuBar>{
 		Q_OBJECT
-		public:
-			MenuBar(std::string name = "") {
-			}
-			virtual void init(std::string name = "");
+		protected:
+			virtual void initImpl() override;
 	};
 }
 
 #endif
-

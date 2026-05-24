@@ -10,7 +10,7 @@
 #include "mediainfopane.hxx"
 
 namespace pelican {
-	MediaInfoPane::MediaInfoPane() {
+	void MediaInfoPane::initImpl() {
 		_layout.addWidget(new QLabel("Name"), _layout.rowCount(), 0);
 		_layout.addWidget(&_nameLabel, _layout.rowCount() - 1, 1);
 		_layout.addWidget(new QLabel("Focal length"), _layout.rowCount(), 0);
@@ -43,7 +43,7 @@ namespace pelican {
 			_isoLabel.setText("");
 			return;
 		}
-		Exiv2::Image::AutoPtr image;
+		std::unique_ptr<Exiv2::Image>image;
 		try {
 			image = Exiv2::ImageFactory::open(_media->path().concat(_media->suffix(".jpg")));
 			image->readMetadata();

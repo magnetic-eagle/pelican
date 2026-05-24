@@ -3,6 +3,7 @@
 
 #include <cmath>
 
+#include <QBoxLayout>
 #include <QFutureWatcher>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
@@ -12,13 +13,13 @@
 #include <QResizeEvent>
 #include <QToolBar>
 
-#include "singleton.hxx"
+#include <easyqt/singleton.hxx>
+#include <qwidget.h>
 
 #include "media.hxx"
-#include "mediaview.hxx"
 
 namespace pelican {
-	class MediaShowArea: public Singleton<MediaShowArea, QWidget> {
+	class MediaShowArea: public QWidget, public easyqt::NamedSingleton<MediaShowArea> {
 		Q_OBJECT
 		public:
 			class GraphicsView: public QGraphicsView {

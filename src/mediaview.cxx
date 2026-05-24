@@ -1,5 +1,3 @@
-#include <ranges>
-
 #include <QImage>
 #include <QMessageBox>
 #include <QPainter>

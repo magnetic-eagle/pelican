@@ -1,10 +1,10 @@
 #include "menubar.hxx"
 
 namespace pelican {
-	void MenuBar::init(std::string name) {
-		LOG(DEBUG, "Initializing pelican::MenuBar with name " << name);
+	void MenuBar::initImpl() {
+		LOG(DEBUG, "Initializing pelican::MenuBar with name " << _name);
 		std::string file;
-		if (name == "pelican::GlobalMenuBar") {
+		if (_name == "pelican::GlobalMenuBar") {
 			file = "res:ui/menubar.xml";
 		}
 		if (!file.empty()) {

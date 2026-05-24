@@ -5,10 +5,10 @@
 
 #include <argparse/argparse.hpp>
 
+#include <easyqt/logging.hxx>
 #include "application.hxx"
 #include "commands.hxx"
 #include "config.hxx"
-#include "logging.hxx"
 #include "mainwindow.hxx"
 #include "mediaview.hxx"
 
