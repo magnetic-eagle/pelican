@@ -5,12 +5,12 @@
 #include <QLabel>
 #include <QWidget>
 
-#include <easyqt/singleton.hxx>
+#include <easyqt/object.hxx>
 
 #include "media.hxx"
 
 namespace pelican {
-	class MediaInfoPane: public QWidget, public easyqt::NamedSingleton<MediaInfoPane> {
+	class MediaInfoPane: public easyqt::Object<QWidget> {
 		Q_OBJECT
 		public:
 			void setMedia(MediaPtr media);

@@ -1,3 +1,4 @@
+#include <easyqt/objectregistry.hxx>
 #include <filesystem>
 
 #include <QDir>
@@ -34,8 +35,8 @@ namespace pelican {
 	}
 
 	void Application::initUI() {
-		auto w = MainWindow::instance();
-		w->initUI();
+		LOG(DEBUG, "Initializing Pelican application")
+		auto w = easyqt::ObjectRegistry::get<MainWindow>();
 		w->showMaximized();
 		
 		_mediaDirectoryWatcher.addPath(_mediaDirectoryPath.c_str());
@@ -64,7 +65,7 @@ namespace pelican {
 			}
 		}
 		
-		MediaView::instance()->rebuild();
+		easyqt::ObjectRegistry::get<MediaView>()->rebuild();
 	}
 	
 	MediaPtrVector Application::medias() {

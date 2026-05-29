@@ -4,6 +4,8 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 
+#include <easyqt/logging.hxx>
+
 #include "mainwindow.hxx"
 #include "uiloader.hxx"
 
@@ -15,7 +17,8 @@ namespace pelican {
 		delete mainWidget;
 	}
 	
-	void MainWindow::initUI() {
+	void MainWindow::initImpl() {
+		LOG(DEBUG, "Initializing main window")
 		setWindowTitle("Pelican");
 		loadWidgetFromFile<MainWindow>("res:ui/mainwindow.ui");
 		QSplitter* mainSplitter = findChild<QSplitter*>("MainSplitter");

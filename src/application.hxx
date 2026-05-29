@@ -33,7 +33,7 @@ namespace pelican {
 		
 		private:
 			QFileSystemWatcher _mediaDirectoryWatcher;
-			std::filesystem::path _mediaDirectoryPath = {"/mnt/Toshiba-1TB/Photos/la-photo-au-coeur-du-sauvage/"};
+			std::filesystem::path _mediaDirectoryPath = {"/home/admin/Pictures/Presentation"};
 			std::map<std::string, MediaPtr> _medias;
 	};
 }

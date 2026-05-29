@@ -13,13 +13,12 @@
 #include <QResizeEvent>
 #include <QToolBar>
 
-#include <easyqt/singleton.hxx>
-#include <qwidget.h>
+#include <easyqt/object.hxx>
 
 #include "media.hxx"
 
 namespace pelican {
-	class MediaShowArea: public QWidget, public easyqt::NamedSingleton<MediaShowArea> {
+	class MediaShowArea: public easyqt::Object<QWidget> {
 		Q_OBJECT
 		public:
 			class GraphicsView: public QGraphicsView {

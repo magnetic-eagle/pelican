@@ -1,3 +1,5 @@
+#include <easyqt/objectregistry.hxx>
+
 #include "commands.hxx"
 #include "mediashowarea.hxx"
 #include "mediaview.hxx"
@@ -5,37 +7,37 @@
 namespace pelican {
 	EASYQTCOMMAND_GEN_IMPL(
 		MediaViewSelectAllCommand, "mediaview-select-all",
-		MediaView::instance()->selectAll()
+		easyqt::ObjectRegistry::get<MediaView>()->selectAll()
 	);
 	EASYQTCOMMAND_GEN_IMPL(
 		MediaViewInvertSelectionCommand, "mediaview-invert-selection",
-		MediaView::instance()->invertSelection()
+		easyqt::ObjectRegistry::get<MediaView>()->invertSelection()
 	);
 	EASYQTCOMMAND_GEN_IMPL(
 		MediaShowAreaScaleIncreaseCommand, "mediashowarea-scale-increase",
-		MediaShowArea::instance()->scaleIncrease()
+		easyqt::ObjectRegistry::get<MediaShowArea>()->scaleIncrease()
 	);
 	EASYQTCOMMAND_GEN_IMPL(
 		MediaShowAreaScaleDecreaseCommand, "mediashowarea-scale-decrease",
-		MediaShowArea::instance()->scaleDecrease()
+		easyqt::ObjectRegistry::get<MediaShowArea>()->scaleDecrease()
 	);
 	EASYQTCOMMAND_GEN_IMPL(
 		MediaShowAreaScaleFitCommand, "mediashowarea-scale-fit",
-		MediaShowArea::instance()->scaleFit()
+		easyqt::ObjectRegistry::get<MediaShowArea>()->scaleFit()
 	);
 	EASYQTCOMMAND_GEN_IMPL(
 		MediaShowAreaScaleOriginalSizeCommand, "mediashowarea-scale-original-size",
-		MediaShowArea::instance()->scaleOriginalSize()
+		easyqt::ObjectRegistry::get<MediaShowArea>()->scaleOriginalSize()
 	)
 	
 	void addCommands() {
 		easyqt::addCommands({
-			MediaViewSelectAllCommand::instance(),
-			MediaViewInvertSelectionCommand::instance(),
-			MediaShowAreaScaleIncreaseCommand::instance(),
-			MediaShowAreaScaleDecreaseCommand::instance(),
-			MediaShowAreaScaleFitCommand::instance(),
-			MediaShowAreaScaleOriginalSizeCommand::instance(),
+			easyqt::ObjectRegistry::get<MediaViewSelectAllCommand>(),
+			easyqt::ObjectRegistry::get<MediaViewInvertSelectionCommand>(),
+			easyqt::ObjectRegistry::get<MediaShowAreaScaleIncreaseCommand>(),
+			easyqt::ObjectRegistry::get<MediaShowAreaScaleDecreaseCommand>(),
+			easyqt::ObjectRegistry::get<MediaShowAreaScaleFitCommand>(),
+			easyqt::ObjectRegistry::get<MediaShowAreaScaleOriginalSizeCommand>(),
 		});
 	}
 }

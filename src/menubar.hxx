@@ -6,7 +6,7 @@
 #include <easyqt/singleton.hxx>
 
 namespace pelican {
-	class MenuBar: public easyqt::MenuBar, public easyqt::NamedSingleton<MenuBar>{
+	class MenuBar: public easyqt::MenuBar {
 		Q_OBJECT
 		protected:
 			virtual void initImpl() override;

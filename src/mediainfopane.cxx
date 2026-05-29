@@ -1,10 +1,12 @@
 #include <QThreadPool>
 
+#include <exiv2/tags.hpp>
 #include <fmt/core.h>
 
 #include <exiv2/exiv2.hpp>
 
 #include <easyqt/logging.hxx>
+#include <qlabel.h>
 
 #include "exifutils.hxx"
 #include "mediainfopane.hxx"
@@ -43,7 +45,7 @@ namespace pelican {
 			_isoLabel.setText("");
 			return;
 		}
-		std::unique_ptr<Exiv2::Image>image;
+		std::unique_ptr<Exiv2::Image> image;
 		try {
 			image = Exiv2::ImageFactory::open(_media->path().concat(_media->suffix(".jpg")));
 			image->readMetadata();
@@ -54,18 +56,27 @@ namespace pelican {
 		Exiv2::ExifData& exifData = image->exifData();
 		
 		_nameLabel.setText(_media->filename().c_str());
-		_focalLengthLabel.setText(
-			exif::formatFocalLength(exif::parseNumber(exifData["Exif.Photo.FocalLength"].value().toString())).c_str()
-		);
-		_shutterSpeedLabel.setText(
-			exif::formatShutterSpeed(exif::parseNumber(exifData["Exif.Photo.ExposureTime"].value().toString())).c_str()
-		);
-		_apertureLabel.setText(
-			exif::formatAperture(exif::parseNumber(exifData["Exif.Photo.FNumber"].value().toString())).c_str()
-		);
-		_isoLabel.setText(
-			exif::formatISO(exif::parseNumber(exifData["Exif.Photo.ISOSpeedRatings"].value().toString())).c_str()
-		);
+		const std::map<std::string, std::pair<QLabel&, std::function<std::string(const std::string&)> > > tagMap = {
+			{"Exif.Photo.FocalLength", {_focalLengthLabel, &exif::formatFocalLength}},
+			{"Exif.Photo.ExposureTime", {_shutterSpeedLabel, &exif::formatShutterSpeed}},
+			{"Exif.Photo.FNumber", {_apertureLabel, &exif::formatAperture}},
+			{"Exif.Photo.ISOSpeedRatings", {_isoLabel, &exif::formatISO}},
+		};
+		for (const auto& tagMapEntry: tagMap) {
+			const std::string& tag = tagMapEntry.first;
+			QLabel& label = tagMapEntry.second.first;
+			auto parseFunc = tagMapEntry.second.second;
+			auto exifKeyIt = exifData.findKey(Exiv2::ExifKey(tag));
+			if (exifKeyIt != exifData.end()) {
+				label.setText(
+					parseFunc(exifKeyIt->value().toString()).c_str()
+				);
+			} else {
+				label.setText(
+					parseFunc("").c_str()
+				);
+			}
+		}
 	}
 }
 

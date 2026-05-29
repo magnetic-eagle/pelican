@@ -9,6 +9,7 @@
 #include <QThreadPool>
 
 #include <easyqt/logging.hxx>
+#include <easyqt/objectregistry.hxx>
 
 #include "application.hxx"
 #include "mediainfopane.hxx"
@@ -79,7 +80,7 @@ namespace pelican {
 					op = MediaView::AddToSelection;
 				}
 			}
-			MediaView::instance()->selectEntry(this, op);
+			easyqt::ObjectRegistry::get<MediaView>()->selectEntry(this, op);
 		}
 	}
 	
@@ -87,8 +88,8 @@ namespace pelican {
 	
 	void MediaViewEntry::mouseDoubleClickEvent(QMouseEvent* event) {
 		if (event->modifiers() == Qt::NoModifier) {
-			MediaShowArea::instance()->show();
-			MediaShowArea::instance()->setMedia(_media);
+			easyqt::ObjectRegistry::get<MediaShowArea>()->show();
+			easyqt::ObjectRegistry::get<MediaShowArea>()->setMedia(_media);
 		}
 	}
 	
@@ -116,11 +117,19 @@ namespace pelican {
 	
 	void MediaView::rebuild() {
 		auto it = std::ranges::find(_mediaEntries, _selectionStartEntry);
-		int i = std::distance(_mediaEntries.begin(), it);
-		while (_layout.takeAt(0)) {
-			_mediaEntries.erase(_mediaEntries.begin() - 1);
+		int i = -1;
+		if (it != _mediaEntries.end()) {
+			i = std::distance(_mediaEntries.begin(), it);
 		}
-		
+
+		while (QLayoutItem* item = _layout.takeAt(0)) {
+			if (QWidget* widget = item->widget()) {
+				widget->deleteLater();
+			}
+			delete item;
+		}
+		_mediaEntries.clear();
+
 		for (const auto& media: Application::instance()->medias()) {
 			MediaViewEntry* mediaEntry = new MediaViewEntry(media);
 			_mediaEntries.push_back(mediaEntry); 
@@ -130,14 +139,14 @@ namespace pelican {
 		
 		if (i >= 0 and i < _mediaEntries.size()) {
 			selectEntry(_mediaEntries[i], ReplaceSelection);
+			ensureWidgetVisible(_mediaEntries[i], 0, 0);
 		} else {
 			clearSelection();
 		}
-		ensureWidgetVisible(_mediaEntries[i], 0, 0);
 	}
 	
 	QSize MediaView::sizeHint() const {
-		if (MediaShowArea::instance()->isVisible()) {
+		if (easyqt::ObjectRegistry::get<MediaShowArea>()->isVisible()) {
 			return minimumSizeHint();
 		}
 		QSize hint = _layout.sizeHint();
@@ -165,8 +174,8 @@ namespace pelican {
 			entry->setSelected(true);
 			_selectionStartEntry = entry;
 			ensureWidgetVisible(entry, 0, 0);
-			if (MediaShowArea::instance()->isVisible()) {
-				MediaShowArea::instance()->setMedia(entry->media());
+			if (easyqt::ObjectRegistry::get<MediaShowArea>()->isVisible()) {
+				easyqt::ObjectRegistry::get<MediaShowArea>()->setMedia(entry->media());
 			}
 		} else if (op == AddToSelection) {
 			entry->setSelected(true);
@@ -199,9 +208,9 @@ namespace pelican {
 			ensureWidgetVisible(entry, 0, 0);
 		}
 		if (_selectionStartEntry) {
-			MediaInfoPane::instance()->setMedia(_selectionStartEntry->media());
+			easyqt::ObjectRegistry::get<MediaInfoPane>()->setMedia(_selectionStartEntry->media());
 		} else {
-			MediaInfoPane::instance()->setMedia(nullptr);
+			easyqt::ObjectRegistry::get<MediaInfoPane>()->setMedia(nullptr);
 		}
 	}
 	
@@ -210,7 +219,7 @@ namespace pelican {
 			mediaEntry->setSelected(true);
 		}
 		_selectionStartEntry = nullptr;
-		MediaInfoPane::instance()->setMedia(nullptr);
+		easyqt::ObjectRegistry::get<MediaInfoPane>()->setMedia(nullptr);
 	}
 	
 	void MediaView::invertSelection() {
@@ -222,11 +231,11 @@ namespace pelican {
 			}
 		}
 		if (selected.size() == 1) {
-			MediaInfoPane::instance()->setMedia(selected[0]->media());
+			easyqt::ObjectRegistry::get<MediaInfoPane>()->setMedia(selected[0]->media());
 			_selectionStartEntry = selected[0];
 			ensureWidgetVisible(_selectionStartEntry, 0, 0);
 		} else {
-			MediaInfoPane::instance()->setMedia(nullptr);
+			easyqt::ObjectRegistry::get<MediaInfoPane>()->setMedia(nullptr);
 			_selectionStartEntry = nullptr;
 		}
 	}
@@ -235,7 +244,7 @@ namespace pelican {
 		for (const auto& mediaEntry: _mediaEntries) {
 			mediaEntry->setSelected(false);
 		}
-		MediaInfoPane::instance()->setMedia(nullptr);
+		easyqt::ObjectRegistry::get<MediaInfoPane>()->setMedia(nullptr);
 	}
 	
 	void MediaView::resizeEvent(QResizeEvent* event) {
@@ -357,7 +366,7 @@ namespace pelican {
 					entry->deleteFiles();
 				}
 				
-				MediaShowArea::instance()->setMedia(nullptr);
+				easyqt::ObjectRegistry::get<MediaShowArea>()->setMedia(nullptr);
 			}
 		}
 

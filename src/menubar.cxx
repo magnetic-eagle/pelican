@@ -2,9 +2,9 @@
 
 namespace pelican {
 	void MenuBar::initImpl() {
-		LOG(DEBUG, "Initializing pelican::MenuBar with name " << _name);
+		LOG(DEBUG, "Initializing pelican::MenuBar with name " << name());
 		std::string file;
-		if (_name == "pelican::GlobalMenuBar") {
+		if (name() == "pelican::GlobalMenuBar") {
 			file = "res:ui/menubar.xml";
 		}
 		if (!file.empty()) {

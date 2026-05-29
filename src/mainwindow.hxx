@@ -3,15 +3,17 @@
 
 #include <QMainWindow>
 
-#include <easyqt/singleton.hxx>
+#include <easyqt/object.hxx>
 
 namespace pelican {
-	class MainWindow: public QMainWindow, public easyqt::NamedSingleton<MainWindow> {
+	class MainWindow: public easyqt::Object<QMainWindow> {
 		Q_OBJECT
 		public:
 			MainWindow();
 			~MainWindow();
-			void initUI();
+			
+		protected:
+			void initImpl() override;
 		
 		private:
 			QWidget* mainWidget;

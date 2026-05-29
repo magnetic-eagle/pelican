@@ -7,7 +7,7 @@
 
 #include "exifutils.hxx"
 
-std::optional<double> _stod(std::string s) {
+std::optional<double> _stod(const std::string& s) {
 	std::optional<double> v = std::nullopt;
 	try {
 		v = std::stod(s);
@@ -19,7 +19,7 @@ std::optional<double> _stod(std::string s) {
 
 namespace pelican {
 	namespace exif {
-		std::optional<double> parseNumber(std::string s) {
+		std::optional<double> parseNumber(const std::string& s) {
 			if (s.empty()) {
 				return std::nullopt;
 			}
@@ -36,40 +36,24 @@ namespace pelican {
 				return _stod(s);
 			}
 		}
+		GEN_FORMAT_FUNC_IMPL(FocalLength, "{:.1f} mm", "- mm",)
+		GEN_FORMAT_FUNC_IMPL(Aperture, "F/{:2.1f}", "F/-",)
 		
-		std::string formatFocalLength(std::optional<double> focalLength) {
-			if (focalLength == std::nullopt) {
-				return "- mm";
-			}
-			return fmt::format("{:.1f} mm", *focalLength);
-		}
-		
-		std::string formatShutterSpeed(std::optional<double> duration) {
+		std::string formatShutterSpeed(const std::string& durationStr) {
+			std::optional<double> duration = parseNumber(durationStr);
 			if (duration == std::nullopt) {
 				return "- s";
 			}
 			if (*duration < 1) {
 				int one_by_duration = std::round(1.0 / *duration);
 				return fmt::format("1/{:d} s", one_by_duration);
-			} else if (*duration < 60) {
-				return fmt::format("{:.1f} s", *duration);
 			} else {
-				return fmt::format("{:.1f} m", (*duration) / 60.0);
+				return fmt::format("{:.0f} s", *duration);
 			}
 		}
 		
-		std::string formatAperture(std::optional<double> fNumber) {
-			if (fNumber == std::nullopt) {
-				return "F/-";
-			}
-			if (std::rint(*fNumber) != *fNumber) {
-				return fmt::format("F/{:2.1f}", *fNumber);
-			} else {
-				return fmt::format("F/{:2.0f}", *fNumber);
-			}
-		}
-		
-		std::string formatISO(std::optional<double> iso) {
+		std::string formatISO(const std::string& isoStr) {
+			std::optional<double> iso = parseNumber(isoStr);
 			if (iso == std::nullopt) {
 				return "-";
 			}

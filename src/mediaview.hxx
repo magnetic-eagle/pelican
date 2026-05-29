@@ -11,7 +11,7 @@
 
 #include <easyqt/flowlayout.hxx>
 #include <easyqt/scrollarea.hxx>
-#include <easyqt/singleton.hxx>
+#include <easyqt/object.hxx>
 
 #include "media.hxx"
 
@@ -49,7 +49,7 @@ namespace pelican {
 			bool _selected = {false};
 	};
 	
-	class MediaView: public easyqt::ScrollArea, public easyqt::Singleton<MediaView> {
+	class MediaView: public easyqt::Object<easyqt::ScrollArea> {
 		Q_OBJECT
 		
 		public:
@@ -75,8 +75,9 @@ namespace pelican {
 			virtual void keyPressEvent(QKeyEvent* event) override;
 			virtual QSize sizeHint() const override;
 			virtual QSize minimumSizeHint() const override;
-		
+			
 		protected:
+			void initImpl() override { rebuild(); };
 			void selectEntry(MediaViewEntry* entry, SelectionOperation op);
 		
 		private:

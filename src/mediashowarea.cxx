@@ -4,6 +4,7 @@
 #include <QPixmap>
 #include <QtConcurrent>
 
+#include <easyqt/objectregistry.hxx>
 #include <fmt/format.h>
 
 #include <easyqt/commands.hxx>
@@ -116,7 +117,7 @@ namespace pelican {
 		if (event->key() == Qt::Key_Escape) {
 			_parent ->hide();
 		} else {
-			MediaView::instance()->keyPressEvent(event);
+			easyqt::ObjectRegistry::get<MediaShowArea>()->keyPressEvent(event);
 		}
 		
 		QGraphicsView::keyPressEvent(event);
