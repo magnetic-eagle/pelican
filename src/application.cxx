@@ -28,8 +28,10 @@ namespace pelican {
 		
 		arguments.parse_args(argc, argv);
 		
-		easyqt::Logger::instance()->setLogLevel(arguments.get<std::string>("--log-level"));
-		LOG(INFO, "log level: " << easyqt::Logger::instance()->logLevel());
+		easyqt::ObjectRegistry::get<easyqt::Logger>()->setLogLevel(
+			arguments.get<std::string>("--log-level")
+		);
+		LOG(INFO, "Log level: " << easyqt::ObjectRegistry::get<easyqt::Logger>()->logLevel());
 		
 		addCommands();
 	}
