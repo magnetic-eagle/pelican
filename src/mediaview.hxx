@@ -34,7 +34,7 @@ namespace pelican {
 			virtual void mousePressEvent(QMouseEvent* event) override;
 			virtual void mouseReleaseEvent(QMouseEvent* event) override;
 			virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
-			virtual void enterEvent(QEvent* event) override;
+			virtual void enterEvent(QEnterEvent* event) override;
 			virtual void leaveEvent(QEvent* event) override;
 		
 		protected:

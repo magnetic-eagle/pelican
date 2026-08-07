@@ -28,11 +28,10 @@ namespace pelican {
 			// @return Suffix matching file extension @param ext, or empty string if no suffix corresponding to @param ext is found
 			std::string suffixForExtension(std::string ext);
 			
-			// @description Get a thumbnail of this media
-			// @param width Desired width of the thumbnail
-			// @param height Desired height of the thumbnail
-			// @return The thumbnail
-			QPixmap thumbnail(int width, int height);
+			// @description Generate a thumbnail of this media
+			// @param size Desired size of the thumbnail in its larger dimension
+			// @return The thumbnail, or std::nullopt if there is an error reading the media or generating the thumbnail
+			std::optional<QImage> thumbnail(unsigned int size);
 			
 			// @return Path to this media without file extension
 			std::filesystem::path path();

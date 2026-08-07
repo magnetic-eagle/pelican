@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(pelican
 	VERSION 1.0.0
-	DESCRIPTION "Graphical video clip managing tool"
+	DESCRIPTION "Graphical photo and video clip managing tool"
 	HOMEPAGE_URL "https://github.com/TheFGFSEagle/pelican"
 	LANGUAGES CXX
 )
@@ -22,7 +22,7 @@ find_package(exiv2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(pystring REQUIRED)
 
-find_package(Qt5 COMPONENTS Concurrent Core Gui UiTools Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Concurrent Core Gui UiTools Widgets REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(3rdparty)

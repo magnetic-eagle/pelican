@@ -33,7 +33,8 @@ namespace pelican {
 	
 	void MediaInfoPane::setMedia(MediaPtr media) {
 		_media = media;
-		QThreadPool::globalInstance()->start(std::bind(&MediaInfoPane::showMediaInfo, this));
+		//QThreadPool::globalInstance()->start(std::bind(&MediaInfoPane::showMediaInfo, this));
+		showMediaInfo();
 	}
 	
 	void MediaInfoPane::showMediaInfo() {

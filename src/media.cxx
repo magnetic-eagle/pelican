@@ -1,11 +1,14 @@
-#include <easyqt/logging.hxx>
-#include <easyqt/utils.hxx>
-
-#include <exiv2/exiv2.hpp>
 #include <memory>
 
+#include <easyqt/logging.hxx>
+#include <easyqt/objectregistry.hxx>
+#include <easyqt/utils.hxx>
+
+#include <FreeImagePlus.h>
+
+#include <exiv2/exiv2.hpp>
+
 #include "media.hxx"
-#include "thumbnailmanager.hxx"
 
 namespace pelican {
 	void Media::addSuffix(std::filesystem::path suffix) {
@@ -16,10 +19,41 @@ namespace pelican {
 		_suffixes.insert(suffix);
 	}
 	
-	QPixmap Media::thumbnail(int width, int height) {
-		return ThumbnailManager::instance()->thumbnail(this, width, height);
+	std::optional<QImage> Media::thumbnail(unsigned int size) {
+		std::string mediaPath = path().concat(suffix(".jpg")).string();
+		fipImage image;
+		bool success = image.load(mediaPath.c_str());
+		if (!success) {
+			LOG(ERROR, "Failed loading '" << mediaPath << "' for thumbnail generation");
+			return std::nullopt;
+		}
+		success = image.makeThumbnail(size);
+		if (!success) {
+			LOG(ERROR, "Failed creating thumbnail for '" << mediaPath << "'");
+			return std::nullopt;
+		}
+
+		QImage::Format format = QImage::Format_ARGB32;
+		switch (image.getBitsPerPixel()) {
+			case 24:
+				format = QImage::Format_BGR888;
+				break;
+			case 32:
+				format = QImage::Format_ARGB32;
+				break;
+			default:
+				image.convertTo32Bits();
+				format = QImage::Format_ARGB32;
+		}
+		return QImage(
+			image.accessPixels(),
+			image.getWidth(),
+			image.getHeight(),
+			image.getScanWidth(),
+			format
+		).copy();
 	}
-	
+
 	std::string Media::suffixForExtension(std::string ext) {
 		ext = std::tolower(ext);
 		for (const auto& suffix: _suffixes) {

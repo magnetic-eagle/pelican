@@ -3,24 +3,38 @@
 
 #include <filesystem>
 
-#include <QPixmap>
+#include <QThreadPool>
 
-#include <easyqt/singleton.hxx>
+#include <easyqt/object.hxx>
 
 #include "media.hxx"
 
 namespace pelican {
-	class ThumbnailManager: public easyqt::NamedSingleton<ThumbnailManager> {
+	class ThumbnailManager: public easyqt::Object<> {
 		public:
 			ThumbnailManager();
-		
-			QPixmap thumbnail(Media* media, int width, int height);
-			QPixmap thumbnail(MediaPtr media, int width, int height) { return thumbnail(media.get(), width, height); };
+			~ThumbnailManager();
+			void shutdown();
+			void requestThumbnail(MediaPtr media, unsigned int size, std::function<void(QImage)> callback);
 		
 		private:
-			void generateThumbnail(Media* media, std::filesystem::path path, int width, int height);
+			class Job: public QRunnable {
+				public:
+					Job(MediaPtr media, std::filesystem::path thumbPath, unsigned int size, std::function<void(QImage)> callback):
+						_media(media), _thumbPath(thumbPath), _size(size), _callback(callback)
+					{}
+				private:
+					MediaPtr _media;
+					std::filesystem::path _thumbPath;
+					unsigned int _size;
+					std::function<void(QImage)> _callback;
+
+				void run() override;
+			};
 			
 			std::filesystem::path _thumbnailDirectory;
+
+			QThreadPool _threadPool;
 	};
 }
 

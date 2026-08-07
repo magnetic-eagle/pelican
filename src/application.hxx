@@ -18,6 +18,7 @@ namespace pelican {
 		Q_OBJECT
 		public:
 			Application(int& argc, char **argv);
+			~Application();
 			void initUI();
 			static Application* instance() {
 				return qobject_cast<Application*>(easyqt::Application::instance());
@@ -33,7 +34,7 @@ namespace pelican {
 		
 		private:
 			QFileSystemWatcher _mediaDirectoryWatcher;
-			std::filesystem::path _mediaDirectoryPath = {"/home/admin/Pictures/Presentation"};
+			std::filesystem::path _mediaDirectoryPath = {"/mnt/Important-5TB/Kamera/LumixG85/Fotos"};
 			std::map<std::string, MediaPtr> _medias;
 	};
 }

@@ -10,10 +10,12 @@
 
 #include <easyqt/logging.hxx>
 #include <easyqt/objectregistry.hxx>
+#include <qpixmap.h>
 
 #include "application.hxx"
 #include "mediainfopane.hxx"
 #include "mediashowarea.hxx"
+#include "thumbnailmanager.hxx"
 #include "mediaview.hxx"
 
 #define THUMBNAIL_SIZE 128
@@ -29,18 +31,24 @@ namespace pelican {
 		setFocusPolicy(Qt::NoFocus);
 		
 		_thumbnailLabel.setFixedSize(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-		_thumbnailLabel.setPixmap(QIcon::fromTheme("image-jpg").pixmap(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+		_thumbnailLabel.setPixmap(QIcon::fromTheme("image-jpeg").pixmap(THUMBNAIL_SIZE, THUMBNAIL_SIZE, QIcon::Mode::Selected, QIcon::State::On));
 		_layout.addWidget(&_thumbnailLabel, 0, 0);
 		_layout.setAlignment(&_thumbnailLabel, Qt::AlignCenter);
 		_nameLabel.setText(media->filename().c_str());
 		_layout.addWidget(&_nameLabel, 1, 0);
 		_layout.setAlignment(&_nameLabel, Qt::AlignCenter);
 		
-		QThreadPool::globalInstance()->start(std::bind(&MediaViewEntry::showThumbnail, this));
+		showThumbnail();
 	}
 	
 	void MediaViewEntry::showThumbnail() {
-		_thumbnailLabel.setPixmap(_media->thumbnail(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+		easyqt::ObjectRegistry::get<ThumbnailManager>()->requestThumbnail(
+			_media,
+			THUMBNAIL_SIZE,
+			[this](QImage img) {
+				_thumbnailLabel.setPixmap(QPixmap::fromImage(img));
+			}
+		);
 	}
 	
 	void MediaViewEntry::deleteFiles() {
@@ -93,7 +101,7 @@ namespace pelican {
 		}
 	}
 	
-	void MediaViewEntry::enterEvent(QEvent* event) {
+	void MediaViewEntry::enterEvent(QEnterEvent* event) {
 		update();
 	}
 	

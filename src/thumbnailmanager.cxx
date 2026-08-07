@@ -1,60 +1,85 @@
-#include <algorithm>
-#include <sstream>
-
+#include <QCryptographicHash>
+#include <QImageReader>
 #include <QStandardPaths>
+#include <QString>
+#include <QUrl>
 
 #include <FreeImagePlus.h>
 
 #include <easyqt/logging.hxx>
+#include <easyqt/objectregistry.hxx>
 
 #include "thumbnailmanager.hxx"
+#include "mediaview.hxx"
 
 namespace pelican {
 	ThumbnailManager::ThumbnailManager() {
 		_thumbnailDirectory = std::filesystem::path(QStandardPaths::writableLocation(QStandardPaths::CacheLocation).toStdString()) / "thumbnails";
 		std::filesystem::create_directories(_thumbnailDirectory);
 	}
+
+	ThumbnailManager::~ThumbnailManager() {
+		shutdown();
+	}
 	
-	QPixmap ThumbnailManager::thumbnail(Media* media, int width, int height) {
+	void ThumbnailManager::shutdown() {
+		_threadPool.clear();
+		_threadPool.waitForDone();
+	}		
+	
+	void ThumbnailManager::requestThumbnail(MediaPtr media, unsigned int size, std::function<void(QImage)> callback) {
 		// Get media path
 		std::filesystem::path path = media->path().concat(media->suffix(".jpg"));
 		
 		
-		// Hashing function taken from https://stackoverflow.com/a/13325223/14909980
-		unsigned long long int hash = 7 + width + height;
-		for (const auto& c: path.filename().string()) {
-			hash = hash * 31 + c;
-		}
+		QString uri = QUrl::fromLocalFile(
+			QString::fromStdString(path.string())
+		).toString();
+
+		QByteArray hash = QCryptographicHash::hash(
+			uri.toUtf8(),
+			QCryptographicHash::Sha256
+		);
+
+		std::string hashstr = hash.toHex().toStdString();
+		std::filesystem::path thumbnailPath = (_thumbnailDirectory / hashstr).concat(".png");
 		
-		std::ostringstream hashstr;
-		hashstr << std::setfill('0') << std::setw(sizeof(unsigned long long int) * 2) << std::hex << hash;
-		std::filesystem::path thumbnailPath = (_thumbnailDirectory / hashstr.str()).concat(".png");
-		
-		if (!std::filesystem::is_regular_file(thumbnailPath)) {
-			generateThumbnail(media, thumbnailPath, width, height);
-		}
-		LOG(DEBUG, "Loading thumbnail for " << path << " from " << thumbnailPath);
-		return QPixmap(thumbnailPath.c_str());
+		auto *job = new Job{
+			media,
+			thumbnailPath,
+			size,
+			std::move(callback)
+		};
+
+		_threadPool.start(job);
 	}
 	
-	void ThumbnailManager::generateThumbnail(Media* media, std::filesystem::path thumbnailPath, int width, int height) {
-		std::string mediaPath = media->path().concat(media->suffix(".jpg")).string();
-		LOG(DEBUG, "Generating thumbnail for '" << mediaPath << "' at '" << thumbnailPath << "'");
-		fipImage originalImage;
-		bool success = originalImage.load(mediaPath.c_str());
-		if (!success) {
-			LOG(ERROR, "Failed loading '" << mediaPath << "' for thumbnail generation");
-			return;
+	void ThumbnailManager::Job::run() {
+		LOG(DEBUG, "Generating thumbnail for '" << _media->path() << "' at '" << _thumbPath << "'");
+		if (!std::filesystem::is_regular_file(_thumbPath)) {
+			std::optional<QImage> thumb = _media->thumbnail(_size);
+			if (thumb == std::nullopt) {
+				return;
+			}
+			bool success = thumb->save(_thumbPath.c_str());
+			if (!success) {
+				LOG(ERROR, "Failed saving thumbnail for '" << _media->path() << "' to '" << _thumbPath << "'");
+				return;
+			}
 		}
-		success = originalImage.makeThumbnail(std::max(width, height));
-		if (!success) {
-			LOG(ERROR, "Failed creating thumbnail for '" << mediaPath << "'");
-			return;
+
+		QImageReader reader(_thumbPath.c_str());
+		QImage thumb = reader.read();
+		if (thumb.isNull()) {
+			LOG(ERROR, "Failed loading thumbnail for '" << _media->path() << "' from '" << _thumbPath << "': " << reader.errorString());
 		}
-		success = originalImage.save(thumbnailPath.c_str());
-		if (!success) {
-			LOG(ERROR, "Failed saving thumbnail for '" << mediaPath << "' to '" << thumbnailPath << "'");
-		}
+		QMetaObject::invokeMethod(
+			easyqt::ObjectRegistry::get<MediaView>(),
+			[callback = std::move(_callback), thumb]() {
+				callback(thumb);
+			},
+			Qt::QueuedConnection
+		);
 	}
 }
 

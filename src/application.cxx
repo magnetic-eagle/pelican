@@ -12,6 +12,7 @@
 #include "config.hxx"
 #include "mainwindow.hxx"
 #include "mediaview.hxx"
+#include "thumbnailmanager.hxx"
 
 namespace pelican {
 	Application::Application(int& argc, char **argv):
@@ -34,6 +35,10 @@ namespace pelican {
 		LOG(INFO, "Log level: " << easyqt::ObjectRegistry::get<easyqt::Logger>()->logLevel());
 		
 		addCommands();
+	}
+
+	Application::~Application() {
+		easyqt::ObjectRegistry::get<ThumbnailManager>()->shutdown();
 	}
 
 	void Application::initUI() {
