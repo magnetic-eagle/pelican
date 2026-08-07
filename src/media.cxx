@@ -45,6 +45,7 @@ namespace pelican {
 				image.convertTo32Bits();
 				format = QImage::Format_ARGB32;
 		}
+		image.flipVertical();
 		return QImage(
 			image.accessPixels(),
 			image.getWidth(),
