@@ -1,3 +1,6 @@
+#include <atomic>
+#include <memory>
+
 #include <QCryptographicHash>
 #include <QImageReader>
 #include <QStandardPaths>
@@ -27,7 +30,7 @@ namespace pelican {
 		_threadPool.waitForDone();
 	}		
 	
-	void ThumbnailManager::requestThumbnail(MediaPtr media, unsigned int size, std::function<void(QImage)> callback) {
+	std::shared_ptr<std::atomic_bool> ThumbnailManager::requestThumbnail(MediaPtr media, unsigned int size, std::function<void(QImage)> callback, ThumbnailPriority priority) {
 		// Get media path
 		std::filesystem::path path = media->path().concat(media->suffix(".jpg"));
 		
@@ -44,24 +47,40 @@ namespace pelican {
 		std::string hashstr = hash.toHex().toStdString();
 		std::filesystem::path thumbnailPath = (_thumbnailDirectory / hashstr).concat(".png");
 		
+		auto cancelled = std::make_shared<std::atomic_bool>(false);
 		auto *job = new Job{
 			media,
 			thumbnailPath,
 			size,
-			std::move(callback)
+			std::move(callback),
+			cancelled
 		};
 
-		_threadPool.start(job);
+		_threadPool.start(job, (int)priority);
+
+		return cancelled;
 	}
 	
 	void ThumbnailManager::Job::run() {
-		LOG(DEBUG, "Generating thumbnail for '" << _media->path() << "' at '" << _thumbPath << "'");
+		if (_cancelled->load()) {
+			return;
+		}
 		if (!std::filesystem::is_regular_file(_thumbPath)) {
+			LOG(DEBUG, "Generating thumbnail for '" << _media->path() << "' at '" << _thumbPath << "'");
 			std::optional<QImage> thumb = _media->thumbnail(_size);
+
+			if (_cancelled->load()) {
+				return;
+			}
 			if (thumb == std::nullopt) {
 				return;
 			}
+
 			bool success = thumb->save(_thumbPath.c_str());
+			if (_cancelled->load()) {
+				return;
+			}
+
 			if (!success) {
 				LOG(ERROR, "Failed saving thumbnail for '" << _media->path() << "' to '" << _thumbPath << "'");
 				return;
@@ -73,6 +92,10 @@ namespace pelican {
 		if (thumb.isNull()) {
 			LOG(ERROR, "Failed loading thumbnail for '" << _media->path() << "' from '" << _thumbPath << "': " << reader.errorString());
 		}
+		if (_cancelled->load()) {
+			return;
+		}
+
 		QMetaObject::invokeMethod(
 			easyqt::ObjectRegistry::get<MediaView>(),
 			[callback = std::move(_callback), thumb]() {
