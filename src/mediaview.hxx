@@ -1,59 +1,32 @@
 #ifndef PELICAN_MEDIALIST_HXX
 #define PELICAN_MEDIALIST_HXX
 
+#include <memory>
+
 #include <QEnterEvent>
 #include <QFileSystemWatcher>
+#include <QGraphicsEffect>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPoint>
 #include <QRubberBand>
 #include <QScrollArea>
 
-#include <easyqt/flowlayout.hxx>
-#include <easyqt/scrollarea.hxx>
 #include <easyqt/object.hxx>
-
-#include "media.hxx"
+#include <easyqt/scrollarea.hxx>
+#include <easyqt/viewedflowlayout.hxx>
 
 namespace pelican {
 	class MediaView;
-	
-	class MediaViewEntry: public QWidget {
-		Q_OBJECT
-		
-		public:
-			friend MediaView;
-			
-			MediaViewEntry(MediaPtr media);
-			void showThumbnail();
-			void deleteFiles();
-			bool selected() { return _selected; };
-			MediaPtr media() { return _media; };
-		
-			virtual void paintEvent(QPaintEvent* event) override;
-			virtual void mousePressEvent(QMouseEvent* event) override;
-			virtual void mouseReleaseEvent(QMouseEvent* event) override;
-			virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
-			virtual void enterEvent(QEnterEvent* event) override;
-			virtual void leaveEvent(QEvent* event) override;
-		
-		protected:
-			void setSelected(bool selected);
-		
-		private:
-			QGridLayout _layout;
-			QLabel _thumbnailLabel;
-			QLabel _nameLabel;
-			
-			MediaPtr _media;
-			bool _selected = {false};
-	};
+	class MediaViewEntry;
+	class MediaViewEntryWidget;
+	typedef std::shared_ptr<MediaViewEntry> MediaViewEntryPtr;
 	
 	class MediaView: public easyqt::Object<easyqt::ScrollArea> {
 		Q_OBJECT
 		
 		public:
-			friend MediaViewEntry;
+			friend MediaViewEntryWidget;
 			
 			enum SelectionOperation {
 				ReplaceSelection,
@@ -75,19 +48,22 @@ namespace pelican {
 			virtual void keyPressEvent(QKeyEvent* event) override;
 			virtual QSize sizeHint() const override;
 			virtual QSize minimumSizeHint() const override;
-			
+			bool eventFilter(QObject* watched, QEvent* event) override;
+
 		protected:
 			void initImpl() override { rebuild(); };
-			void selectEntry(MediaViewEntry* entry, SelectionOperation op);
+			void selectEntry(MediaViewEntryPtr entry, SelectionOperation op);
+			MediaViewEntryPtr getMediaEntry(unsigned int index) const { return _mediaEntries.at(index); }
+			void updateVisibleWidgets();
 		
 		private:
-			easyqt::FlowLayout _layout;
-			std::vector<MediaViewEntry*> _mediaEntries;
-			MediaViewEntry* _selectionStartEntry = nullptr;
+			easyqt::ViewedFlowLayout _layout;
+			std::vector<MediaViewEntryPtr> _mediaEntries;
+			int _selectionStartEntry = -1;
 			QRubberBand* _rubberBand;
 			QPoint _rubberBandOrigin;
 	};
-} 
+}
 
 #endif
 
