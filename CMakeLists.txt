@@ -16,6 +16,14 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(CMAKE_CXX_FLAGS_DEBUGASAN
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined -fno-omit-frame-pointer -g"
+)
+
+set(CMAKE_EXE_LINKER_FLAGS_DEBUGASAN
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address,undefined"
+)
+
 find_package(PkgConfig)
 find_package(FreeImagePlus REQUIRED)
 find_package(exiv2 REQUIRED)
