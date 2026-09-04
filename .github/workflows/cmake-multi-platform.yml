@@ -1,4 +1,3 @@
-```yaml
 name: CMake
 
 on:
@@ -214,4 +213,3 @@ jobs:
           ctest
           --build-config ${{ matrix.build_type }}
           --output-on-failure
-```
