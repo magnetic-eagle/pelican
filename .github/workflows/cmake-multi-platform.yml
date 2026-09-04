@@ -1,4 +1,5 @@
-name: CMake CI
+```yaml
+name: CMake
 
 on:
   push:
@@ -31,7 +32,7 @@ jobs:
             architecture: x86_64
             build_type: Debug
 
-          # macOS x86_64 / Intel
+          # macOS Intel x86_64
           - os: macos-26-intel
             architecture: x86_64
             build_type: Release
@@ -40,7 +41,7 @@ jobs:
             architecture: x86_64
             build_type: Debug
 
-          # macOS arm64 / Apple Silicon
+          # macOS Apple Silicon arm64
           - os: macos-26
             architecture: arm64
             build_type: Release
@@ -57,18 +58,106 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set reusable strings
-        id: strings
+      # ------------------------------------------------------------
+      # Linux dependencies
+      # ------------------------------------------------------------
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            pkg-config \
+            qt6-base-dev \
+            libexiv2-dev \
+            libfmt-dev \
+            libpugixml-dev \
+            libfreeimageplus-dev
+
+          # pystring is not required here if it is provided by
+          # another dependency/source in the project.
+
+      # ------------------------------------------------------------
+      # vcpkg
+      # ------------------------------------------------------------
+
+      - name: Restore vcpkg cache
+        if: runner.os != 'Linux'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/vcpkg/installed
+            ${{ github.workspace }}/vcpkg/downloads
+            ${{ github.workspace }}/vcpkg/packages
+          key: vcpkg-${{ runner.os }}-${{ matrix.architecture }}-${{ matrix.build_type }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-${{ matrix.architecture }}-${{ matrix.build_type }}-
+            vcpkg-${{ runner.os }}-${{ matrix.architecture }}-
+
+      - name: Install vcpkg
+        if: runner.os != 'Linux'
         shell: bash
         run: |
-          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+          git clone --depth 1 https://github.com/microsoft/vcpkg.git "$GITHUB_WORKSPACE/vcpkg"
+          "$GITHUB_WORKSPACE/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          ./vcpkg/vcpkg install \
+            qtbase \
+            exiv2 \
+            fmt \
+            pugixml \
+            pystring \
+            --triplet x64-windows
+
+      - name: Install dependencies (macOS Intel)
+        if: runner.os == 'macOS' && matrix.architecture == 'x86_64'
+        shell: bash
+        run: |
+          ./vcpkg/vcpkg install \
+            qtbase \
+            exiv2 \
+            fmt \
+            pugixml \
+            pystring \
+            --triplet x64-osx
+
+      - name: Install dependencies (macOS ARM64)
+        if: runner.os == 'macOS' && matrix.architecture == 'arm64'
+        shell: bash
+        run: |
+          ./vcpkg/vcpkg install \
+            qtbase \
+            exiv2 \
+            fmt \
+            pugixml \
+            pystring \
+            --triplet arm64-osx
+
+      # ------------------------------------------------------------
+      # ccache
+      # ------------------------------------------------------------
 
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1
         with:
           key: ${{ runner.os }}-${{ matrix.architecture }}-${{ matrix.build_type }}
 
-      - name: Configure CMake
+      # ------------------------------------------------------------
+      # CMake
+      # ------------------------------------------------------------
+
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+      - name: Configure CMake (Linux)
+        if: runner.os == 'Linux'
         shell: bash
         run: >
           cmake
@@ -78,6 +167,36 @@ jobs:
           -DCMAKE_C_COMPILER_LAUNCHER=ccache
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: >
+          cmake
+          -B "${{ steps.strings.outputs.build-output-dir }}"
+          -S "${{ github.workspace }}"
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          -DVCPKG_TARGET_TRIPLET=x64-windows
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Configure CMake (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: >
+          cmake
+          -B "${{ steps.strings.outputs.build-output-dir }}"
+          -S "${{ github.workspace }}"
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.architecture == 'arm64' && 'arm64-osx' || 'x64-osx' }}
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      # ------------------------------------------------------------
+      # Build
+      # ------------------------------------------------------------
+
       - name: Build
         run: >
           cmake
@@ -85,6 +204,14 @@ jobs:
           --config ${{ matrix.build_type }}
           --parallel
 
+      # ------------------------------------------------------------
+      # Tests
+      # ------------------------------------------------------------
+
       - name: Test
         working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: ctest --build-config ${{ matrix.build_type }} --output-on-failure
+        run: >
+          ctest
+          --build-config ${{ matrix.build_type }}
+          --output-on-failure
+```
