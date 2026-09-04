@@ -71,10 +71,8 @@ jobs:
             libexiv2-dev \
             libfmt-dev \
             libpugixml-dev \
-            libfreeimageplus-dev
-
-          # pystring is not required here if it is provided by
-          # another dependency/source in the project.
+            libfreeimageplus-dev \
+            libpystring-dev
 
       # ------------------------------------------------------------
       # vcpkg
