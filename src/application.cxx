@@ -1,4 +1,3 @@
-#include <easyqt/objectregistry.hxx>
 #include <filesystem>
 
 #include <QDir>
@@ -7,6 +6,9 @@
 #include <argparse/argparse.hpp>
 
 #include <easyqt/logging.hxx>
+#include <easyqt/objectregistry.hxx>
+#include <easyqt/settingsdialog.hxx>
+
 #include "application.hxx"
 #include "commands.hxx"
 #include "config.hxx"
@@ -35,6 +37,8 @@ namespace pelican {
 		LOG(INFO, "Log level: " << easyqt::ObjectRegistry::get<easyqt::Logger>()->logLevel());
 		
 		addCommands();
+
+		easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->loadFromFile("res:/ui/settings.xml");
 	}
 
 	Application::~Application() {

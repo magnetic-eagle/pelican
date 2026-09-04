@@ -1,10 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
         <category>
-                <name>General</name>
+                <name>general</name>
+                <label>General</label>
                 <setting>
-                        <name>Media storage directory</name>
+                        <name>media-storage</name>
+                        <label>Media storage directory</label>
                         <type>path</type>
+                        <level>basic</level>
+                        <default></default>
+                </setting>
+                <setting>
+                        <name>example-bool</name>
+                        <label>Example (bool)</label>
+                        <type>bool</type>
+                        <level>advanced</level>
+                        <default>false</default>
+                </setting>
+                <setting>
+                        <name>example-int</name>
+                        <label>Example (int)</label>
+                        <type>int</type>
+                        <level>developer</level>
+                        <default>0</default>
                 </setting>
         </category>
+        <category>
+                <name>examples</name>
+                <label>Examples</label>
+
+                 <setting>
+                        <name>example-double</name>
+                        <label>Example (double)</label>
+                        <type>double</type>
+                        <level>basic</level>
+                        <default>0</default>
+                </setting>
+                 <setting>
+                        <name>example-string</name>
+                        <label>Example (string)</label>
+                        <type>string</type>
+                        <level>advanced</level>
+                        <default></default>
+                </setting>
+                <setting>
+                        <name>example-pathlist</name>
+                        <label>Example (path list)</label>
+                        <type>pathlist</type>
+                        <level>developer</level>
+                        <default></default>
+                </setting>
+            </category>
 </settings>
