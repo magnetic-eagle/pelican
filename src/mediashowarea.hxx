@@ -1,5 +1,5 @@
-#ifndef PELICAN_MEDIASHOWAREА_HXX
-#define PELICAN_MEDIASHOWAREА_HXX
+#ifndef PELICAN_MEDIASHOWAREA_HXX
+#define PELICAN_MEDIASHOWAREA_HXX
 
 #include <cmath>
 
@@ -60,8 +60,10 @@ namespace pelican {
 			MediaShowArea();
 			
 			inline void setMedia(MediaPtr media) {
-				_media = media;
-				_view.setMedia(media);
+				if (_media != media) {
+					_media = media;
+					_view.setMedia(media);
+				}
 			};
 			inline void setMediaScale(double value) { _view.setMediaScale(value); };
 			
