@@ -1,3 +1,4 @@
+#include <cctype>
 #include <memory>
 
 #include <easyqt/logging.hxx>
@@ -12,11 +13,15 @@
 
 namespace pelican {
 	void Media::addSuffix(std::filesystem::path suffix) {
-		_suffixes.insert(suffix.string());
+		addSuffix(suffix.string());
 	}
 	
 	void Media::addSuffix(std::string suffix) {
 		_suffixes.insert(suffix);
+		std::string lowerSuffix = std::tolower(suffix);
+		if (_type == Type::Image and (lowerSuffix == ".mp4" or lowerSuffix == ".mpeg" or lowerSuffix == ".mts" or lowerSuffix == ".mkv")) {
+			_type = Type::Video;
+		}
 	}
 	
 	std::optional<QImage> Media::thumbnail(unsigned int size) {
@@ -92,11 +97,23 @@ namespace pelican {
 		std::unique_ptr<Exiv2::Image> image;
 		try {
 			image = Exiv2::ImageFactory::open(path().concat(suffix));
-		} catch (Exiv2::BasicError<char>& e) {
+		} catch (Exiv2::Error& e) {
 			LOG(ERROR, "Error opening file for getting pixel size: " << e.what());
 			return QSize();
 		}
-		return {image->pixelWidth(), image->pixelHeight()};
+		// I think we can safely use a cast to int here, because if we are loading an image that is more than 2 billion pixels large, we got bigger problems ...
+		return {(int)image->pixelWidth(), (int)(image->pixelHeight())};
+	}
+
+	void Media::deleteFiles() {
+		bool success = true;
+		for (const auto& path: paths()) {
+			LOG(INFO, "Deleting " << std::quoted(path.string()));
+			success &= std::filesystem::remove(path);
+		}
+		if (!success) {
+			LOG(ERROR, "Some files could not be deleted");
+		}
 	}
 }
 

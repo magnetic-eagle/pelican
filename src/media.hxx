@@ -12,6 +12,11 @@
 namespace pelican {
 	class Media {
 		public:
+			enum class Type {
+				Image,
+				Video,
+			};
+			
 			Media(std::filesystem::path directory, std::string filename, std::set<std::string> suffixes = {}):
 					_directory(directory), _filename(filename), _suffixes(suffixes)
 			{};
@@ -50,11 +55,16 @@ namespace pelican {
 			std::string suffix(std::string preferred = "");
 			
 			QSize size(std::string suffix);
+
+			Type type() { return _type; }
+
+			void deleteFiles();
 		
 		private:
 			std::filesystem::path _directory;
 			std::string _filename;
 			std::set<std::string> _suffixes;
+			Type _type = Type::Image;
 	};
 	
 	using MediaPtr = std::shared_ptr<Media>;

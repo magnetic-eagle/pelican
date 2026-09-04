@@ -50,7 +50,7 @@ namespace pelican {
 		try {
 			image = Exiv2::ImageFactory::open(_media->path().concat(_media->suffix(".jpg")));
 			image->readMetadata();
-		} catch (Exiv2::BasicError<char>& e) {
+		} catch (Exiv2::Error& e) {
 			LOG(ERROR, "Error opening file for reading metadata: " << e.what());
 			return;
 		}
