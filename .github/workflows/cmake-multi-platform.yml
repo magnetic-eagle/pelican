@@ -1,0 +1,90 @@
+name: CMake CI
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          # Linux x86_64
+          - os: ubuntu-latest
+            architecture: x86_64
+            build_type: Release
+
+          - os: ubuntu-latest
+            architecture: x86_64
+            build_type: Debug
+
+          # Windows x86_64
+          - os: windows-latest
+            architecture: x86_64
+            build_type: Release
+
+          - os: windows-latest
+            architecture: x86_64
+            build_type: Debug
+
+          # macOS x86_64 / Intel
+          - os: macos-26-intel
+            architecture: x86_64
+            build_type: Release
+
+          - os: macos-26-intel
+            architecture: x86_64
+            build_type: Debug
+
+          # macOS arm64 / Apple Silicon
+          - os: macos-26
+            architecture: arm64
+            build_type: Release
+
+          - os: macos-26
+            architecture: arm64
+            build_type: Debug
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: ${{ runner.os }}-${{ matrix.architecture }}-${{ matrix.build_type }}
+
+      - name: Configure CMake
+        shell: bash
+        run: >
+          cmake
+          -B "${{ steps.strings.outputs.build-output-dir }}"
+          -S "${{ github.workspace }}"
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build
+        run: >
+          cmake
+          --build "${{ steps.strings.outputs.build-output-dir }}"
+          --config ${{ matrix.build_type }}
+          --parallel
+
+      - name: Test
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: ctest --build-config ${{ matrix.build_type }} --output-on-failure
