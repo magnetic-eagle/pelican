@@ -11,7 +11,6 @@
 #include <easyqt/logging.hxx>
 
 #include "mediashowarea.hxx"
-#include "mediaview.hxx"
 
 namespace pelican {
 	MediaShowArea::GraphicsView::GraphicsView(MediaShowArea* parent): _parent(parent) {
