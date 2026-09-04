@@ -68,6 +68,7 @@ jobs:
           sudo apt-get install -y \
             pkg-config \
             qt6-base-dev \
+            qt6-tools-dev \
             libexiv2-dev \
             libfmt-dev \
             libpugixml-dev \
@@ -104,6 +105,7 @@ jobs:
         run: |
           ./vcpkg/vcpkg install \
             qtbase \
+            qttools \
             exiv2 \
             fmt \
             pugixml \
@@ -116,6 +118,7 @@ jobs:
         run: |
           ./vcpkg/vcpkg install \
             qtbase \
+            qttools \
             exiv2 \
             fmt \
             pugixml \
