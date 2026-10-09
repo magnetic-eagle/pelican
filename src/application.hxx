@@ -1,8 +1,8 @@
 #ifndef PELICAN_APPLICATION_HXX
 #define PELICAN_APPLICATION_HXX
 
-#include <map>
 #include <filesystem>
+#include <map>
 
 #include <QFileSystemWatcher>
 #include <QDir>
@@ -17,13 +17,20 @@ namespace pelican {
 	class Application: public easyqt::Application {
 		Q_OBJECT
 		public:
+			enum class StartupResult {
+				Continue,
+				SettingsAndQuit,
+				Quit,
+			};
+
 			Application(int& argc, char **argv);
 			~Application();
-			void initUI();
+			bool initUI();
 			static Application* instance() {
 				return qobject_cast<Application*>(easyqt::Application::instance());
 			}
 			
+			StartupResult startupCheck();
 			void rescanMedias();
 			MediaPtrVector medias();
 			
@@ -34,7 +41,7 @@ namespace pelican {
 		
 		private:
 			QFileSystemWatcher _mediaDirectoryWatcher;
-			std::filesystem::path _mediaDirectoryPath = {"/mnt/Important-5TB/Kamera/LumixG85/Aufräumen"};
+			std::filesystem::path _mediaDirectoryPath;
 			std::map<std::string, MediaPtr> _medias;
 	};
 }

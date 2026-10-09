@@ -7,7 +7,9 @@ int main(int argc, char *argv[]) {
 	::atexit(Exiv2::XmpParser::terminate);
 	
 	pelican::Application app(argc, argv);
-	app.initUI();
+	if (!app.initUI()) {
+		return 1;
+	}
 	return app.exec();
 }
 

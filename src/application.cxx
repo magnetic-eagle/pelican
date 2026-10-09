@@ -1,6 +1,8 @@
 #include <filesystem>
 
 #include <QDir>
+#include <QMessageBox>
+#include <QPushButton>
 #include <QStandardPaths>
 
 #include <argparse/argparse.hpp>
@@ -20,7 +22,9 @@ namespace pelican {
 	Application::Application(int& argc, char **argv):
 		easyqt::Application(argc, argv), arguments("pelican")
 	{
-		QStringList paths = QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
+		setDesktopFileName("pelican");
+
+		QStringList paths = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
 		std::filesystem::path sourceDataPath = std::filesystem::path(SOURCES_PATH) / "data";
 		paths.append(sourceDataPath.c_str());
 		QDir::setSearchPaths("res", paths);
@@ -38,30 +42,73 @@ namespace pelican {
 		
 		addCommands();
 
-		easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->loadFromFile("res:/ui/settings.xml");
+		easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->setFactorySettingsPath("res:/settings.xml");
+		_mediaDirectoryPath = easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->settingValue<std::filesystem::path>("media-storage-directory");
 	}
 
 	Application::~Application() {
 		easyqt::ObjectRegistry::get<ThumbnailManager>()->shutdown();
 	}
 
-	void Application::initUI() {
+	bool Application::initUI() {
 		LOG(DEBUG, "Initializing Pelican application")
+
+		StartupResult res = startupCheck();
+		switch (res) {
+			case StartupResult::SettingsAndQuit:
+				easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->exec();
+				return false;
+			case StartupResult::Quit:
+				return false;
+			case StartupResult::Continue:
+				break;
+		}
+
 		auto w = easyqt::ObjectRegistry::get<MainWindow>();
 		w->showMaximized();
 		
 		_mediaDirectoryWatcher.addPath(_mediaDirectoryPath.c_str());
 		QObject::connect(&_mediaDirectoryWatcher, &QFileSystemWatcher::directoryChanged, this, &Application::mediaDirectoryChanged);
 		rescanMedias();
+
+		return true;
 	}
 	
 	void Application::mediaDirectoryChanged(const QDir& path) {
 		rescanMedias();
 	}
+
+	Application::StartupResult Application::startupCheck() {
+		if (_mediaDirectoryPath.empty() or !std::filesystem::is_directory(_mediaDirectoryPath)) {
+			LOG(
+				ERROR, "Media storage directory is empty, not defined or does not exist. "
+				"Please select an existing directory in the settings and restart the application"
+			);
+
+			QMessageBox msgBox;
+			msgBox.setWindowFlags(msgBox.windowFlags() & ~Qt::WindowCloseButtonHint);
+			msgBox.setIcon(QMessageBox::Critical);
+			msgBox.setWindowTitle("Unusable media storage directory");
+			msgBox.setText(
+				"Media storage directory is empty, not defined or does not exist.\n"
+				"Please select an existing directory in the settings and restart the application"
+			);
+			QPushButton* quitButton = msgBox.addButton("Quit", QMessageBox::RejectRole);
+			QPushButton* settingsButton = msgBox.addButton("Open Settings ...", QMessageBox::ActionRole);
+			msgBox.exec();
+
+			if (msgBox.clickedButton() == settingsButton) {
+				return StartupResult::SettingsAndQuit;
+			}
+			return StartupResult::Quit;
+		}
+
+		return StartupResult::Continue;
+	}
 	
 	void Application::rescanMedias() {
 		_medias.clear();
-		
+
 		for (const auto& entry: std::filesystem::directory_iterator(_mediaDirectoryPath)) {
 			if (!(entry.is_regular_file() || entry.is_symlink())) {
 				continue;
