@@ -5,4 +5,3 @@ install(
 	DESTINATION
 		share/${CMAKE_PROJECT_NAME}/ui
 )
-

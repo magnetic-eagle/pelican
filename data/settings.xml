@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="/usr/share/xml/easyqt/settings.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<settings>
+	<category>
+		<name>general</name>
+		<label>General</label>
+		<setting>
+			<name>media-storage-directory</name>
+			<label>Media storage directory</label>
+			<level>basic</level>
+			<path>
+				<default></default>
+				<path-type>directory</path-type>
+			</path>
+		</setting>
+	</category>
+</settings>

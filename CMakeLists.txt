@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(pelican
 	VERSION 1.0.0
 	DESCRIPTION "Graphical photo and video clip managing tool"
-	HOMEPAGE_URL "https://github.com/TheFGFSEagle/pelican"
+	HOMEPAGE_URL "https://github.com/magnetic-eagle/pelican"
 	LANGUAGES CXX
 )
 
@@ -29,11 +29,13 @@ find_package(FreeImagePlus REQUIRED)
 find_package(exiv2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(pystring REQUIRED)
+include(GNUInstallDirs)
 
 find_package(Qt6 COMPONENTS Concurrent Core Gui UiTools Widgets REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(3rdparty)
+add_subdirectory(data)
 add_subdirectory(src)
 
 configure_file(config.hxx.in config.hxx @ONLY)

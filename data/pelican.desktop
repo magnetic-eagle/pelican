@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Pelican
+Comment=Media management application
+Exec=pelican
+Terminal=false
+Categories=AudioVideo;Utility;
+StartupNotify=true
