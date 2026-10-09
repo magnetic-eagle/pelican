@@ -1,0 +1,19 @@
+IncludeBlocks: Regroup
+SortIncludes: CaseSensitive
+
+IncludeCategories:
+  # Standard library
+  - Regex: '^<[^Q][^>]*>$'
+    Priority: 1
+
+  # Qt
+  - Regex: '^<Q[^>]+>$'
+    Priority: 2
+
+  # Other third-party
+  - Regex: '^<[^>]+>$'
+    Priority: 3
+
+  # Same-directory
+  - Regex: '^"'
+    Priority: 5
