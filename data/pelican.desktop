@@ -3,6 +3,7 @@ Type=Application
 Name=Pelican
 Comment=Media management application
 Exec=pelican
+Icon=pelican
 Terminal=false
 Categories=AudioVideo;Utility;
 StartupNotify=true

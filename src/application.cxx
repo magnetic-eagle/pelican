@@ -23,10 +23,13 @@ namespace pelican {
 		easyqt::Application(argc, argv), arguments("pelican")
 	{
 		setDesktopFileName("pelican");
-
+		setWindowIcon(QIcon::fromTheme("pelican"));
 		QStringList paths = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
-		std::filesystem::path sourceDataPath = std::filesystem::path(SOURCES_PATH) / "data";
-		paths.append(sourceDataPath.c_str());
+		std::filesystem::path dataPath = std::filesystem::path(PELICAN_DATA_PATH);
+		for (QString path: paths) {
+			paths.append(QDir(path).filePath("pelican"));
+		}
+		paths.append(dataPath.c_str());
 		QDir::setSearchPaths("res", paths);
 		
 		arguments.add_argument("--log-level")
@@ -42,7 +45,7 @@ namespace pelican {
 		
 		addCommands();
 
-		easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->setFactorySettingsPath("res:/settings.xml");
+		easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->setFactorySettingsPath(easyqt::getResourcePath("res:settings.xml"));
 		_mediaDirectoryPath = easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->settingValue<std::filesystem::path>("media-storage-directory");
 	}
 

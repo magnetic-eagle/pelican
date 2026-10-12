@@ -4,12 +4,13 @@
 #include <easyqt/commands.hxx>
 
 namespace pelican {
-	EASYQTCOMMAND_GEN_DEF(MediaViewSelectAllCommand);
-	EASYQTCOMMAND_GEN_DEF(MediaViewInvertSelectionCommand);
-	EASYQTCOMMAND_GEN_DEF(MediaShowAreaScaleIncreaseCommand);
-	EASYQTCOMMAND_GEN_DEF(MediaShowAreaScaleDecreaseCommand);
-	EASYQTCOMMAND_GEN_DEF(MediaShowAreaScaleFitCommand);
-	EASYQTCOMMAND_GEN_DEF(MediaShowAreaScaleOriginalSizeCommand);
+	EASYQTCOMMAND_GEN_DEF(CommandMediaViewSelectAll);
+	EASYQTCOMMAND_GEN_DEF(CommandMediaViewInvertSelection);
+	EASYQTCOMMAND_GEN_DEF(CommandMediaShowAreaScaleIncrease);
+	EASYQTCOMMAND_GEN_DEF(CommandMediaShowAreaScaleDecrease);
+	EASYQTCOMMAND_GEN_DEF(CommandMediaShowAreaScaleFit);
+	EASYQTCOMMAND_GEN_DEF(CommandMediaShowAreaScaleOriginalSize);
+	EASYQTCOMMAND_GEN_DEF(CommandShowImportDialog)
 	
 	void addCommands();
 }
