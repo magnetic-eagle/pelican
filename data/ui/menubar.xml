@@ -3,6 +3,11 @@
 	<menu>
 		<label>File</label>
 		<menuitem>
+			<label>Import media</label>
+			<icon>document-import</icon>
+			<command>show-media-import-dialog</command>
+		</menuitem>
+		<menuitem>
 			<label>Settings</label>
 			<icon>preferences-system</icon>
 			<command>show-settings-dialog</command>

@@ -51,6 +51,7 @@ namespace pelican {
 
 	Application::~Application() {
 		easyqt::ObjectRegistry::get<ThumbnailManager>()->shutdown();
+		easyqt::ObjectRegistry::cleanup();
 	}
 
 	bool Application::initUI() {
@@ -118,12 +119,10 @@ namespace pelican {
 			}
 			std::filesystem::path stem = entry.path().stem();
 			std::filesystem::path ext = entry.path().extension();
-			if (_medias.contains(stem)) {
-				_medias[stem]->addSuffix(ext);
-			} else {
-				_medias[stem] = std::make_shared<Media>(_mediaDirectoryPath, stem.string());
-				_medias[stem]->addSuffix(ext);
+			if (!_medias.contains(stem)) {
+				_medias[stem] = std::make_shared<Media>(_mediaDirectoryPath / stem);
 			}
+			_medias[stem]->addSuffix(ext);
 		}
 		
 		easyqt::ObjectRegistry::get<MediaView>()->rebuild();

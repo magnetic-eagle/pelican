@@ -1,6 +1,7 @@
 #ifndef PELICAN_MEDIA_HXX
 #define PELICAN_MEDIA_HXX
 
+#include <cstdint>
 #include <filesystem>
 #include <memory>
 #include <set>
@@ -13,12 +14,14 @@ namespace pelican {
 	class Media {
 		public:
 			enum class Type {
+				Unknown,
 				Image,
 				Video,
+				Audio,
 			};
 			
-			Media(std::filesystem::path directory, std::string filename, std::set<std::string> suffixes = {}):
-					_directory(directory), _filename(filename), _suffixes(suffixes)
+			Media(std::filesystem::path path, std::set<std::string> suffixes = {}):
+					_path(path), _suffixes(suffixes)
 			{};
 		
 			// @description Add suffix (file type) for this media 
@@ -39,11 +42,11 @@ namespace pelican {
 			std::optional<QImage> thumbnail(unsigned int size);
 			
 			// @return Path to this media without file extension
-			std::filesystem::path path();
+			std::filesystem::path path() { return _path; };
 			// @return Path to the directory that contains this media
-			std::filesystem::path directory() { return _directory; };
+			std::filesystem::path directory() { return _path.parent_path(); };
 			// @return Name of this media (without extension)
-			std::string filename() { return _filename; };
+			std::string filename() { return _path.stem(); };
 			// @return Suffixes (file extensions) of all files asociated with this media. There is always at least one suffix
 			std::set<std::string> suffixes() { return _suffixes; };
 			// @return Paths to all files associated with this media.
@@ -58,17 +61,35 @@ namespace pelican {
 
 			Type type() { return _type; }
 
+			const std::string& typeString() const;
+
 			void deleteFiles();
+
+			std::uintmax_t totalDiskSpace();
+		
+		protected:
+			void recalculateTotalDiskSpace();
 		
 		private:
-			std::filesystem::path _directory;
-			std::string _filename;
+			std::filesystem::path _path;
 			std::set<std::string> _suffixes;
 			Type _type = Type::Image;
+
+			std::uintmax_t _totalDiskSpace = 0;
+			bool _totalDiskSpaceOutdated = true;
 	};
 	
 	using MediaPtr = std::shared_ptr<Media>;
 	using MediaPtrVector = std::vector<MediaPtr>;
+
+	class MediaPtrComparator {
+		public:
+			bool operator()(const MediaPtr& lhs, const MediaPtr& rhs) const {
+				return lhs->path() < rhs->path();
+			}
+	};
+
+	using MediaPtrSet = std::set<MediaPtr, MediaPtrComparator>;
 }
 
 #endif

@@ -10,7 +10,7 @@ namespace pelican {
 	EASYQTCOMMAND_GEN_DEF(CommandMediaShowAreaScaleDecrease);
 	EASYQTCOMMAND_GEN_DEF(CommandMediaShowAreaScaleFit);
 	EASYQTCOMMAND_GEN_DEF(CommandMediaShowAreaScaleOriginalSize);
-	EASYQTCOMMAND_GEN_DEF(CommandShowImportDialog)
+	EASYQTCOMMAND_GEN_DEF(CommandShowMediaImportDialog)
 	
 	void addCommands();
 }

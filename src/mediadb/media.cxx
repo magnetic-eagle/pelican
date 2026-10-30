@@ -3,7 +3,6 @@
 
 #include <easyqt/logging.hxx>
 #include <easyqt/objectregistry.hxx>
-#include <easyqt/utils.hxx>
 
 #include <FreeImagePlus.h>
 
@@ -18,6 +17,7 @@ namespace pelican {
 	
 	void Media::addSuffix(std::string suffix) {
 		_suffixes.insert(suffix);
+		_totalDiskSpaceOutdated = true;
 		std::string lowerSuffix = std::tolower(suffix);
 		if (_type == Type::Image and (lowerSuffix == ".mp4" or lowerSuffix == ".mpeg" or lowerSuffix == ".mts" or lowerSuffix == ".mkv")) {
 			_type = Type::Video;
@@ -81,10 +81,6 @@ namespace pelican {
 		return s;
 	}
 	
-	std::filesystem::path Media::path() {
-		return directory() / filename();
-	}
-	
 	std::vector<std::filesystem::path> Media::paths() {
 		std::vector<std::filesystem::path> v;
 		for (const auto& suffix: _suffixes) {
@@ -101,7 +97,8 @@ namespace pelican {
 			LOG(ERROR, "Error opening file for getting pixel size: " << e.what());
 			return QSize();
 		}
-		// I think we can safely use a cast to int here, because if we are loading an image that is more than 2 billion pixels large, we got bigger problems ...
+
+		// I think we can safely use a cast to int here, because if we are loading an image that is more than 2 billion pixels large in either dimension, we got bigger problems ...
 		return {(int)image->pixelWidth(), (int)(image->pixelHeight())};
 	}
 
@@ -114,6 +111,39 @@ namespace pelican {
 		if (!success) {
 			LOG(ERROR, "Some files could not be deleted");
 		}
+		_totalDiskSpace = true;
+	}
+
+	std::uintmax_t Media::totalDiskSpace() {
+		if (_totalDiskSpaceOutdated) {
+			recalculateTotalDiskSpace();
+			_totalDiskSpaceOutdated = false;
+		}
+		return _totalDiskSpace;
+	}
+
+	void Media::recalculateTotalDiskSpace() {
+		_totalDiskSpace = 0;
+		for (const auto& path: paths()) {
+			if (!std::filesystem::exists(path)) {
+				continue;
+			}
+			try {
+				_totalDiskSpace += std::filesystem::file_size(path);
+			} catch (std::filesystem::filesystem_error& e) {
+				LOG(WARN, "Could not get file size of " << std::quoted(path.string()) << ": " << e.what());
+			}
+		}
+	}
+
+	const std::string& Media::typeString() const {
+		static std::map<Type, const std::string> typeMap = {
+			{Type::Unknown, "Unknown"},
+			{Type::Audio, "Audio"},
+			{Type::Image, "Image"},
+			{Type::Video, "Video"},
+		};
+		return typeMap[_type];
 	}
 }
 

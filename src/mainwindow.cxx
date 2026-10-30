@@ -14,7 +14,6 @@ namespace pelican {
 	}
 	
 	MainWindow::~MainWindow() {
-		delete mainWidget;
 	}
 	
 	void MainWindow::initImpl() {

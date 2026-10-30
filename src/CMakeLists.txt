@@ -1,11 +1,13 @@
+add_subdirectory(mediadb)
+
 add_executable(pelican
 	application.cxx
 	commands.cxx
-	exifutils.cxx
 	main.cxx
 	mainwindow.cxx
-	media.cxx
+	mediaimportdialog.cxx
 	mediainfopane.cxx
+	mediaitemmodel.cxx
 	mediashowarea.cxx
 	mediaview.cxx
 	menubar.cxx
@@ -18,8 +20,8 @@ target_include_directories(
 		${FREEIMAGEPLUS_INCLUDE_DIRS}
 		${PYSTRING_INCLUDE_DIRS}
 )
-target_link_libraries(
-	pelican
+target_link_libraries(pelican
+	pelican-mediadb
 	Qt::Concurrent
 	Qt::Core
 	Qt::Gui

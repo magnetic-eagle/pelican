@@ -14,9 +14,6 @@ namespace pelican {
 			
 		protected:
 			void initImpl() override;
-		
-		private:
-			QWidget* mainWidget;
 	};
 }
 

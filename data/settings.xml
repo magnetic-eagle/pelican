@@ -13,5 +13,14 @@
 				<path-type>directory</path-type>
 			</path>
 		</setting>
+		<setting>
+			<name>last-media-import-directory</name>
+			<label>Last directory media was imported from</label>
+			<level>developer</level>
+			<path>
+				<default></default>
+				<path-type>directory</path-type>
+			</path>
+		</setting>
 	</category>
 </settings>

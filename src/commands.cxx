@@ -31,7 +31,7 @@ namespace pelican {
 		easyqt::ObjectRegistry::get<MediaShowArea>()->scaleOriginalSize()
 	)
 	EASYQTCOMMAND_GEN_IMPL(
-		CommandShowImportDialog, "show-media-import-dialog", 
+		CommandShowMediaImportDialog, "show-media-import-dialog", 
 		easyqt::ObjectRegistry::get<MediaImportDialog>()->show();
 	)
 	
@@ -43,6 +43,7 @@ namespace pelican {
 			easyqt::ObjectRegistry::get<CommandMediaShowAreaScaleDecrease>(),
 			easyqt::ObjectRegistry::get<CommandMediaShowAreaScaleFit>(),
 			easyqt::ObjectRegistry::get<CommandMediaShowAreaScaleOriginalSize>(),
+			easyqt::ObjectRegistry::get<CommandShowMediaImportDialog>(),
 		});
 	}
 }
