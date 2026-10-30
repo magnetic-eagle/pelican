@@ -29,6 +29,7 @@ find_package(FreeImagePlus REQUIRED)
 find_package(exiv2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(pystring REQUIRED)
+find_package(easyqt REQUIRED)
 include(GNUInstallDirs)
 
 find_package(Qt6 COMPONENTS Concurrent Core Gui UiTools Widgets REQUIRED)
