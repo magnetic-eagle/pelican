@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include <fmt/chrono.h>
+
 #include <easyqt/logging.hxx>
 #include <easyqt/objectregistry.hxx>
 #include <easyqt/pathentry.hxx>
@@ -40,20 +42,20 @@ namespace pelican {
 		label = new QLabel("2. Scan");
 		layout->addWidget(label);
 
-		QGridLayout* scanLayout = new QGridLayout;
+		QHBoxLayout* scanLayout = new QHBoxLayout;
 		layout->addLayout(scanLayout);
 
 		_spinner = new easyqt::Spinner;
-		scanLayout->addWidget(_spinner, 0, 0, Qt::AlignLeft);
+		scanLayout->addWidget(_spinner, 0, Qt::AlignLeft);
 
 		_scanProgressLabel = new QLabel("Scanning done, found 9999999999 files");
 		_scanProgressLabel->hide();
-		scanLayout->addWidget(_scanProgressLabel, 0, 1, Qt::AlignRight);
+		scanLayout->addWidget(_scanProgressLabel, 0, Qt::AlignRight);
 
-		_startAbortButton = new QPushButton("Start");
-		_startAbortButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-		connect(_startAbortButton, &QPushButton::clicked, this, &MediaImportDialog::onScanButtonClicked);
-		scanLayout->addWidget(_startAbortButton, 0, 2, Qt::AlignRight);
+		_scanStartAbortButton = new QPushButton("Start");
+		_scanStartAbortButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+		connect(_scanStartAbortButton, &QPushButton::clicked, this, &MediaImportDialog::onScanButtonClicked);
+		scanLayout->addWidget(_scanStartAbortButton, 0, Qt::AlignRight);
 
 		label = new QLabel("3. Review media");
 		layout->addWidget(label);
@@ -65,10 +67,20 @@ namespace pelican {
 		layout->addWidget(_scannedMediaView);
 
 		label = new QLabel("4. Import");
+		layout->addWidget(label);
 
 		_importProgressBar = new QProgressBar;
 		_importProgressBar->setRange(0, 1);
 		layout->addWidget(_importProgressBar);
+
+		QHBoxLayout* importLayout = new QHBoxLayout;
+		layout->addLayout(importLayout);
+
+		_importProgressLabel = new QLabel("Importing done, 999 TB of 999 TB, 00:00:00 elapsed, 00:00:00 left");
+		importLayout->addWidget(_importProgressLabel, 0, Qt::AlignLeft);
+
+		_importStartAbortButton = new QPushButton("Start");
+		importLayout->addWidget(_importStartAbortButton, 0, Qt::AlignRight);
 
 		_buttonBox = new QDialogButtonBox(
 			QDialogButtonBox::Close
@@ -95,17 +107,20 @@ namespace pelican {
 						_importer.scannedFilesCount(),
 						_importer.scannedMediasCount()
 					).c_str());
-					_startAbortButton->setText("Restart");
+					_scanStartAbortButton->setText("Restart");
 					_spinner->stop();
 					_scannedMediaModel->setMediaCollection(_importer.scannedMedias());
-					//_importProgressBar->setMaximum(_importer.scannedMediaCollection()->to);
+					//_importProgressBar->setMaximum(_importer.scannedMediaCollection()->totalDiskSpace());
 				}, Qt::QueuedConnection);
 				break;
 			case mediadb::Importer::ProgressStatus::MediaImported:
 				QMetaObject::invokeMethod(this, [this]{
-					_scanProgressLabel->setText(std::format(
-						"Importing ... {} medias processed",
-						_importer.importedMediasCount()
+					_scanProgressLabel->setText(fmt::format(
+						"Importing ... {} of {}, {} elapsed, {} left",
+						_importer.importedMediasCount(),
+						_importer.scannedMediasCount(),
+						_importer.importingTimeElapsed(),
+						_importer.importingTimeLeft(),
 					).c_str());
 				}, Qt::QueuedConnection);
 				break;
@@ -129,14 +144,14 @@ namespace pelican {
 			case mediadb::Importer::Status::Inactive:
 				_spinner->start();
 				_scanProgressLabel->show();
-				_startAbortButton->setText("Abort");
+				_scanStartAbortButton->setText("Abort");
 				_importer.scan();
 				easyqt::ObjectRegistry::get<easyqt::SettingsDialog>()->setSettingValue("last-media-import-directory", _importPathEntry->path());
 				break;
 			case mediadb::Importer::Status::Scanning:
 				_spinner->stop();
 				_scanProgressLabel->show();
-				_startAbortButton->setText("Scan");
+				_scanStartAbortButton->setText("Scan");
 				_importer.stop();
 				break;
 			default:

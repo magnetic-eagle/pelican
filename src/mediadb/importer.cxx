@@ -30,7 +30,6 @@ namespace pelican::mediadb {
 				media = std::make_shared<Media>(path);
 				_scannedMedias->addMedia(media);
 			}
-			LOG(WARN, "scanned " << path << " media: " << media << " path " << media->path());
 			media->addSuffix(ext);
 			_scannedFilesCount++;
 

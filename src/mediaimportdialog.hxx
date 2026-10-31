@@ -32,14 +32,17 @@ namespace pelican {
 		
 		private:
 			easyqt::PathEntry* _importPathEntry;
-			QPushButton* _startAbortButton;
+			QPushButton* _scanStartAbortButton;
 			easyqt::Spinner* _spinner;
 			QLabel* _scanProgressLabel;
 			QTreeView* _scannedMediaView;
 			MediaItemModel* _scannedMediaModel;
 			QProgressBar* _importProgressBar;
+			QLabel* _importProgressLabel;
+			QPushButton* _importStartAbortButton;
 			QDialogButtonBox* _buttonBox;
 
 			mediadb::Importer _importer;
+			std::chrono::time_point<std::chrono::steady_clock> _importingStartTime;
 	};
 }
