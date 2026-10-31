@@ -73,6 +73,7 @@ jobs:
             libfmt-dev \
             libpugixml-dev \
             libfreeimageplus-dev \
+            libsqlitecpp-dev \
             libpystring-dev
 
       # ------------------------------------------------------------
@@ -110,6 +111,7 @@ jobs:
             fmt \
             pugixml \
             pystring \
+            sqlitecpp \
             --triplet x64-windows
 
       - name: Install dependencies (macOS Intel)
@@ -123,6 +125,7 @@ jobs:
             fmt \
             pugixml \
             pystring \
+            sqlitecpp \
             --triplet x64-osx
 
       - name: Install dependencies (macOS ARM64)
@@ -135,6 +138,7 @@ jobs:
             fmt \
             pugixml \
             pystring \
+            sqlitecpp \
             --triplet arm64-osx
 
       # ------------------------------------------------------------

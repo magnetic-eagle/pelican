@@ -1,27 +1,4 @@
 set(ENABLE_TESTING OFF)
-set(SYSTEM_PUGIXML OFF)
-set(SYSTEM_EASYQT OFF)
-
-if (PkgConfig_FOUND)
-	if (NOT TARGET pugixml::pugixml)
-		pkg_check_modules(PugiXML IMPORTED_TARGET pugixml)
-		
-		if(PugiXML_FOUND)
-			set(SYSTEM_PUGIXML ON)
-			add_library(pugixml::pugixml INTERFACE IMPORTED GLOBAL)
-			target_link_libraries(pugixml::pugixml INTERFACE PkgConfig::PugiXML)
-		endif()
-	endif()
-		
-	if (NOT TARGET easyqt::easyqt)
-		pkg_check_modules(EasyQt IMPORTED_TARGET easyqt)
-		if(EasyQt_FOUND)
-			set(SYSTEM_EASYQT ON)
-			add_library(easyqt::easyqt INTERFACE IMPORTED GLOBAL)
-			target_link_libraries(easyqt::easyqt INTERFACE PkgConfig::EasyQt)
-		endif()
-	endif()
-endif()
 
 if (NOT TARGET pugixml::pugixml AND NOT SYSTEM_PUGIXML)
 	message(STATUS "Using system provided PugiXML library")
