@@ -67,9 +67,9 @@ namespace pelican {
 		public:
 			friend MediaView;
 
-			MediaViewEntry(MediaPtr media): media(media) {}
+			MediaViewEntry(mediadb::MediaPtr media): media(media) {}
 
-			MediaPtr media = {};
+			mediadb::MediaPtr media = {};
 
 
 			bool selected() const { return _selected; }
@@ -115,15 +115,15 @@ namespace pelican {
 	}
 
 	void MediaViewEntryWidget::resetThumbnail() {
-		Media::Type type = Media::Type::Image;
+		mediadb::Media::Type type = mediadb::Media::Type::Image;
 		if (_mediaEntry and _mediaEntry->media) {
 			type = _mediaEntry->media->type();
 		}
 		switch (type) {
-			case Media::Type::Image:
+			case mediadb::Media::Type::Image:
 				_thumbnailLabel->setPixmap(QIcon::fromTheme("image-jpeg").pixmap(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
 				break;
-			case Media::Type::Video:
+			case mediadb::Media::Type::Video:
 				_thumbnailLabel->setPixmap(QIcon::fromTheme("video-x-generic").pixmap(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
 				break;
 		}

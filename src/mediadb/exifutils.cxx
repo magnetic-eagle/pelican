@@ -17,7 +17,7 @@ std::optional<double> _stod(const std::string& s) {
 	return v;
 }
 
-namespace pelican {
+namespace pelican::mediadb {
 	namespace exif {
 		std::optional<double> parseNumber(const std::string& s) {
 			if (s.empty()) {

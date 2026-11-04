@@ -120,7 +120,7 @@ namespace pelican {
 			std::filesystem::path stem = entry.path().stem();
 			std::filesystem::path ext = entry.path().extension();
 			if (!_medias.contains(stem)) {
-				_medias[stem] = std::make_shared<Media>(_mediaDirectoryPath / stem);
+				_medias[stem] = std::make_shared<mediadb::Media>(_mediaDirectoryPath / stem);
 			}
 			_medias[stem]->addSuffix(ext);
 		}
@@ -128,8 +128,8 @@ namespace pelican {
 		easyqt::ObjectRegistry::get<MediaView>()->rebuild();
 	}
 	
-	MediaPtrVector Application::medias() {
-		MediaPtrVector medias;
+	mediadb::MediaPtrVector Application::medias() {
+		mediadb::MediaPtrVector medias;
 		for (const auto& [_, media]: _medias) {
 			medias.push_back(media);
 		}

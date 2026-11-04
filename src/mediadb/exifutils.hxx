@@ -17,7 +17,7 @@ std::string format##name(const std::string& name##Str) { \
 }
 
 
-namespace pelican {
+namespace pelican::mediadb {
 	namespace exif {
 		std::optional<double> parseNumber(const std::string& s);
 		std::string formatFocalLength(const std::string& focalLength);

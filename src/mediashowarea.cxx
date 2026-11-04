@@ -21,7 +21,7 @@ namespace pelican {
 		setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 	}
 	
-	void MediaShowArea::GraphicsView::setMedia(MediaPtr media) {
+	void MediaShowArea::GraphicsView::setMedia(mediadb::MediaPtr media) {
 		_media = media;
 		_imageItem->setPixmap(QPixmap());
 		if (_media) {

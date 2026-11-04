@@ -15,7 +15,7 @@
 
 #include <easyqt/object.hxx>
 
-#include "media.hxx"
+#include "mediadb/media.hxx"
 
 namespace pelican {
 	class MediaShowArea: public easyqt::Object<QWidget> {
@@ -25,7 +25,7 @@ namespace pelican {
 				public:
 					GraphicsView(MediaShowArea* parent);
 			
-					void setMedia(MediaPtr media);
+					void setMedia(mediadb::MediaPtr media);
 					void setMediaScale(double value);
 					
 					void scaleIncrease();
@@ -47,7 +47,7 @@ namespace pelican {
 				
 				private:
 					MediaShowArea* _parent;
-					MediaPtr _media;
+					mediadb::MediaPtr _media;
 					QGraphicsScene _scene;
 					QPixmap _image;
 					QGraphicsPixmapItem* _imageItem = nullptr;
@@ -59,7 +59,7 @@ namespace pelican {
 			
 			MediaShowArea();
 			
-			inline void setMedia(MediaPtr media) {
+			inline void setMedia(mediadb::MediaPtr media) {
 				if (_media != media) {
 					_media = media;
 					_view.setMedia(media);
@@ -75,7 +75,7 @@ namespace pelican {
 			void setScaleInfo(double scale);
 		
 		private:
-			MediaPtr _media;
+			mediadb::MediaPtr _media;
 			QToolBar _toolBar;
 			QPushButton _scaleResetButton;
 			QAction _scaleDecreaseAction, _scaleIncreaseAction, _scaleFitAction, _scaleOriginalSizeAction;

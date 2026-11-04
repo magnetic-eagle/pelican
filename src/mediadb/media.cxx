@@ -10,7 +10,7 @@
 
 #include "media.hxx"
 
-namespace pelican {
+namespace pelican::mediadb {
 	void Media::addSuffix(std::filesystem::path suffix) {
 		addSuffix(suffix.string());
 	}

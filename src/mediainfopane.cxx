@@ -31,7 +31,7 @@ namespace pelican {
 		setFixedWidth(250);
 	}
 	
-	void MediaInfoPane::setMedia(MediaPtr media) {
+	void MediaInfoPane::setMedia(mediadb::MediaPtr media) {
 		_media = media;
 		//QThreadPool::globalInstance()->start(std::bind(&MediaInfoPane::showMediaInfo, this));
 		showMediaInfo();
@@ -58,10 +58,10 @@ namespace pelican {
 		
 		_nameLabel.setText(_media->filename().c_str());
 		const std::map<std::string, std::pair<QLabel&, std::function<std::string(const std::string&)> > > tagMap = {
-			{"Exif.Photo.FocalLength", {_focalLengthLabel, &exif::formatFocalLength}},
-			{"Exif.Photo.ExposureTime", {_shutterSpeedLabel, &exif::formatShutterSpeed}},
-			{"Exif.Photo.FNumber", {_apertureLabel, &exif::formatAperture}},
-			{"Exif.Photo.ISOSpeedRatings", {_isoLabel, &exif::formatISO}},
+			{"Exif.Photo.FocalLength", {_focalLengthLabel, &mediadb::exif::formatFocalLength}},
+			{"Exif.Photo.ExposureTime", {_shutterSpeedLabel, &mediadb::exif::formatShutterSpeed}},
+			{"Exif.Photo.FNumber", {_apertureLabel, &mediadb::exif::formatAperture}},
+			{"Exif.Photo.ISOSpeedRatings", {_isoLabel, &mediadb::exif::formatISO}},
 		};
 		for (const auto& tagMapEntry: tagMap) {
 			const std::string& tag = tagMapEntry.first;

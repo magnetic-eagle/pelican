@@ -10,7 +10,7 @@
 
 #include <QPixmap>
 
-namespace pelican {
+namespace pelican::mediadb {
 	class Media {
 		public:
 			enum class Type {

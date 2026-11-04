@@ -11,7 +11,7 @@
 
 #include <argparse/argparse.hpp>
 
-#include "media.hxx"
+#include "mediadb/media.hxx"
 
 namespace pelican {
 	class Application: public easyqt::Application {
@@ -32,7 +32,7 @@ namespace pelican {
 			
 			StartupResult startupCheck();
 			void rescanMedias();
-			MediaPtrVector medias();
+			mediadb::MediaPtrVector medias();
 			
 			argparse::ArgumentParser arguments;
 			
@@ -42,7 +42,7 @@ namespace pelican {
 		private:
 			QFileSystemWatcher _mediaDirectoryWatcher;
 			std::filesystem::path _mediaDirectoryPath;
-			std::map<std::string, MediaPtr> _medias;
+			std::map<std::string, mediadb::MediaPtr> _medias;
 	};
 }
 

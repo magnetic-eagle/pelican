@@ -9,7 +9,7 @@
 
 #include <easyqt/object.hxx>
 
-#include "media.hxx"
+#include "mediadb/media.hxx"
 
 namespace pelican {
 	constexpr int THUMBNAIL_PRIORITY_BUFFER  = 0;
@@ -25,16 +25,16 @@ namespace pelican {
 			ThumbnailManager();
 			~ThumbnailManager();
 			void shutdown();
-			std::shared_ptr<std::atomic_bool> requestThumbnail(MediaPtr media, unsigned int size, std::function<void(QImage)> callback, ThumbnailPriority priority = ThumbnailPriority::BUFFER);
+			std::shared_ptr<std::atomic_bool> requestThumbnail(mediadb::MediaPtr media, unsigned int size, std::function<void(QImage)> callback, ThumbnailPriority priority = ThumbnailPriority::BUFFER);
 		
 		private:
 			class Job: public QRunnable {
 				public:
-					Job(MediaPtr media, std::filesystem::path thumbPath, unsigned int size, std::function<void(QImage)> callback, std::shared_ptr<std::atomic_bool> cancelled):
+					Job(mediadb::MediaPtr media, std::filesystem::path thumbPath, unsigned int size, std::function<void(QImage)> callback, std::shared_ptr<std::atomic_bool> cancelled):
 						_media(media), _thumbPath(thumbPath), _size(size), _callback(callback), _cancelled(cancelled)
 					{}
 				private:
-					MediaPtr _media;
+					mediadb::MediaPtr _media;
 					std::filesystem::path _thumbPath;
 					unsigned int _size;
 					std::function<void(QImage)> _callback;

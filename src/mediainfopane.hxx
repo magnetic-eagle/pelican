@@ -7,13 +7,13 @@
 
 #include <easyqt/object.hxx>
 
-#include "media.hxx"
+#include "mediadb/media.hxx"
 
 namespace pelican {
 	class MediaInfoPane: public easyqt::Object<QWidget> {
 		Q_OBJECT
 		public:
-			void setMedia(MediaPtr media);
+			void setMedia(mediadb::MediaPtr media);
 			void showMediaInfo();
 		
 		protected:
@@ -22,7 +22,7 @@ namespace pelican {
 		private:
 			QGridLayout _layout;
 			QLabel _nameLabel, _focalLengthLabel, _shutterSpeedLabel, _apertureLabel, _isoLabel;
-			MediaPtr _media;
+			mediadb::MediaPtr _media;
 	};
 }
 

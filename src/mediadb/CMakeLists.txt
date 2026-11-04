@@ -1,6 +1,6 @@
 add_library(pelican-mediadb STATIC
 	collection.cxx
-	#database.cxx
+	database.cxx
 	exifutils.cxx
 	importer.cxx
 	media.cxx

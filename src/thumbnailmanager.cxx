@@ -30,7 +30,7 @@ namespace pelican {
 		_threadPool.waitForDone();
 	}		
 	
-	std::shared_ptr<std::atomic_bool> ThumbnailManager::requestThumbnail(MediaPtr media, unsigned int size, std::function<void(QImage)> callback, ThumbnailPriority priority) {
+	std::shared_ptr<std::atomic_bool> ThumbnailManager::requestThumbnail(mediadb::MediaPtr media, unsigned int size, std::function<void(QImage)> callback, ThumbnailPriority priority) {
 		// Get media path
 		std::filesystem::path path = media->path().concat(media->suffix(".jpg"));
 		
