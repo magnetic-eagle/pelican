@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 project(pelican
 	VERSION 1.0.0
 	DESCRIPTION "Graphical photo and video clip managing tool"
@@ -31,14 +31,24 @@ find_package(fmt REQUIRED)
 find_package(pystring REQUIRED)
 find_package(SQLiteCpp REQUIRED)
 find_package(easyqt)
+find_package(pugixml)
 include(GNUInstallDirs)
 
 find_package(Qt6 COMPONENTS Concurrent Core Gui UiTools Widgets REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(SYSTEM_EASYQT OFF)
+set(SYSTEM_PUGIXML OFF)
 
 if (PkgConfig_FOUND)
+	if (NOT TARGET pugixml::pugixml)
+		pkg_check_modules(PugiXML IMPORTED_TARGET pugixml)
+		if(PugiXML_FOUND)
+			set(SYSTEM_PUGIXML ON)
+			add_library(pugixml::pugixml INTERFACE IMPORTED GLOBAL)
+			target_link_libraries(pugixml::pugixml INTERFACE PkgConfig::PugiXML)
+		endif()
+	endif()
 	if (NOT TARGET easyqt::easyqt)
 		pkg_check_modules(EasyQt IMPORTED_TARGET easyqt)
 		if(EasyQt_FOUND)
